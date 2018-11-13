@@ -1,0 +1,15 @@
+{
+  "commandDescription": "Launches a Moover relational data deployment for a scratch org.",
+  "sourceFlagDescription": "source connection name or record id",
+  "destinationFlagDescription": "destination connection name or record id",
+  "dataSetFlagDescription": "data set to deploy name or record id",
+  "deploymentPlanFlagDescription": "deployment plan to deploy name or record id",
+  "errorNoConnectionFound": "No active connections with the name or record ID '%s' found in the dev hub control org.",
+  "errorSourceAndTargetFlags": "Specify either the source or destination connection parameter, but not both.",
+  "errorDatasetAndPlanFlags": "Specify either the data set or deployment plan parameter, but not both.",
+  "errorNoDatasetAndPlanFlags": "Specify either the data set or deployment plan parameter.",
+  "errorNoDataSetFound": "No active data set with the name or record ID '%s' found in the dev hub control org.",
+  "errorNoDeploymentPlanFound": "No deployment plan with the name or record ID '%s' found in the dev hub control org.",
+  "errorNoControlOrgFound": "No active control org conneciton found in the dev hub control org.",
+  "errorInsertingDeploymentResult": "Failed to insert the deployment result: %s"
+}
