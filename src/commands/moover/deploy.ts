@@ -1,5 +1,7 @@
 import {core, flags, SfdxCommand} from '@salesforce/command';
+//import { XMLHttpRequest } from 'xmlhttprequest-ts';
 //import {Http, Headers, HTTP_PROVIDERS} from 'angular2/http';
+import axios from 'axios'
 
 // Initialize Messages with the current plugin directory
 core.Messages.importMessagesDirectory(__dirname);
@@ -103,9 +105,11 @@ export default class Org extends SfdxCommand {
     let participantConnection;
     let deployDataSet;
     let deployDeploymentPlan;
+    let deploymentEntityId;
 
     let sourceRecordId = "";
     let sourceRefreshToken = "";
+    let sourceAccessToken = "";
     let sourceOrgType = "";
     let sourceOrgId = "";
     let sourceUserId = "";
@@ -113,6 +117,7 @@ export default class Org extends SfdxCommand {
 
     let destinationRecordId = "";
     let destinationRefreshToken = "";
+    let destinationAccessToken = "";
     let destinationOrgType = "";
     let destinationOrgId = "";
     let destinationUserId = "";
@@ -181,6 +186,7 @@ export default class Org extends SfdxCommand {
       if( sourceFlag !== undefined ) {
         sourceRecordId = `${participantConnection.Id}`;
         sourceRefreshToken = `${participantConnection.PDRI__Refresh_Token__c}`;
+        sourceAccessToken = `${participantConnection.PDRI__Access_Token__c}`;
         sourceOrgType = `${participantConnection.PDRI__Org_Type__c}`;
         sourceOrgId = `${participantConnection.PDRI__OrganizationId__c}`;
         sourceUserId = `${participantConnection.PDRI__User_Id__c}`;
@@ -188,6 +194,7 @@ export default class Org extends SfdxCommand {
   
         destinationRecordId = ``;  //Does not exist for scratch org, no connection record
         destinationRefreshToken = `${scratchConn.getAuthInfo().getFields().refreshToken}`;
+        destinationAccessToken = `${scratchConn.getAuthInfo().getFields().accessToken}`;
         destinationOrgType = `Sandbox`;
         destinationOrgId = `${this.org.getOrgId()}`;
         destinationUserId = `${scratchConn.getAuthInfo().getFields().userId}`;
@@ -195,6 +202,7 @@ export default class Org extends SfdxCommand {
       } else if( destinationFlag !== undefined ) {
         sourceRecordId = ``;  //Does not exist for scratch org, no connection record
         sourceRefreshToken = `${scratchConn.getAuthInfo().getFields().refreshToken}`;
+        sourceAccessToken = `${scratchConn.getAuthInfo().getFields().accessToken}`;
         sourceOrgType = `Sandbox`;
         sourceOrgId = `${this.org.getOrgId()}`;
         sourceUserId = `${scratchConn.getAuthInfo().getFields().userId}`;
@@ -210,6 +218,7 @@ export default class Org extends SfdxCommand {
     } else {
       sourceRecordId = ``; //Since using dev hub org connection info from DX, does not exist. If a problem could use control org connection.
       sourceRefreshToken = `${hubConn.getAuthInfo().getFields().refreshToken}`;
+      sourceAccessToken = `${hubConn.getAuthInfo().getFields().accessToken}`;
       sourceOrgType = `Production`;
       sourceOrgId = `${this.hubOrg.getOrgId()}`;
       sourceUserId = `${hubConn.getAuthInfo().getFields().userId}`;
@@ -217,6 +226,7 @@ export default class Org extends SfdxCommand {
 
       destinationRecordId = ``;  //Does not exist for scratch org, no connection record
       destinationRefreshToken = `${scratchConn.getAuthInfo().getFields().refreshToken}`;
+      destinationAccessToken = `${scratchConn.getAuthInfo().getFields().accessToken}`;
       destinationOrgType = `Sandbox`;
       destinationOrgId = `${this.org.getOrgId()}`;
       destinationUserId = `${scratchConn.getAuthInfo().getFields().userId}`;
@@ -250,6 +260,7 @@ export default class Org extends SfdxCommand {
       }
   
       deployDataSet = result.records[0];
+      deploymentEntityId = `${deployDataSet.Id}`;
       this.ux.log(`Retrieved deploy data set record.`);
     } else if( planFlag !== undefined ) {
       const isId = orgIdRegxp.test(planFlag);
@@ -272,7 +283,8 @@ export default class Org extends SfdxCommand {
         throw new core.SfdxError(messages.getMessage('errorNoDeploymentPlanFound', [datasetFlag]));
       }
   
-      deployDataSet = result.records[0];
+      deployDeploymentPlan = result.records[0];
+      deploymentEntityId = `${deployDeploymentPlan.Id}`;
       this.ux.log(`Retrieved deploy deployment plan record.`);
     }
 
@@ -298,15 +310,18 @@ export default class Org extends SfdxCommand {
       'submitterUserId' : `${contextUserId}`, 
       'submitterUserEmail' : 'drudman@prodly.co', 
       'submitterUserFullName' : 'Daniel Rudman',
-      'packageNameSpace' : 'PDRI',
+      'packageNameSpace' : 'PDRI__',
+      'deploymentEntityIds' : [{ 'deploymentEntityId' : `${deploymentEntityId}` }],
       'sourceOrgConnection' : { 'recordId' : `${sourceRecordId}`, 
-        'refreshToken' : `${sourceRefreshToken}`, 
+        //'refreshToken' : `${sourceRefreshToken}`, 
+        'accessToken' : `${sourceAccessToken}`, 
         'orgType' : `${sourceOrgType}`, 
         'orgId' : `${sourceOrgId}`, 
         'userId' : `${sourceUserId}`, 
         'instanceUrl' : `${sourceInstanceUrl}` },
       'targetOrgConnection' : { 'recordId' : `${destinationRecordId}`, 
-        'refreshToken' : `${destinationRefreshToken}`, 
+        //'refreshToken' : `${destinationRefreshToken}`, 
+        'accessToken' : `${destinationAccessToken}`, 
         'orgType' : `${destinationOrgType}`, 
         'orgId' : `${destinationOrgId}`, 
         'userId' : `${destinationUserId}`, 
@@ -322,38 +337,28 @@ export default class Org extends SfdxCommand {
 
     const data = JSON.stringify(param);
 
-    //this.ux.log(`Data: ${data}`);
+    this.ux.log(`Data: ${data}`);
 
     const https = require('https');
     const path = datasetFlag !== undefined ? '/dataset/deploy' : '/plan/deploy';
 
     this.ux.log(`Path: ${path}`);
-    this.ux.log(`Host: deployer.prodly.co`);
-    
-    const options = {
-      hostname: 'deployer.prodly.co',
-      port: 80,
-      path: `${path}`,
-      method: 'POST',
+    this.ux.log(`Host: deployer.dev.prodly.co`);
+
+    let axiosConfig = {
       headers: {
-        'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
       }
     };
-    
-    const req = https.request(options, (res) => {
-      this.ux.log(`statusCode: ${res.statusCode}`)
-    
-      res.on('data', (d) => {
-        this.ux.log(d)
-      })
+
+    axios.post('https://deployer.dev.prodly.co/dataset/deploy', data, axiosConfig)
+    .then((res) => {
+      this.ux.log(`Response status: ${res.status}`);
+      this.ux.log(JSON.stringify(res.data, null, '\t'));
     })
-    
-    req.on('error', (error) => {
-      this.ux.log(error)
+    .catch((err) => {
+      this.ux.log(`Error invoking deployment: ${err}`);
     })
-    
-    req.write(data)
-    req.end()
 
     const outputString = `Deployment launched with the result ID ${deploymentResultId}`;
 
