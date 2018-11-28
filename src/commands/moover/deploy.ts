@@ -1,4 +1,5 @@
 import {core, flags, SfdxCommand} from '@salesforce/command';
+import {AuthInfo} from '@salesforce/core';
 //import { XMLHttpRequest } from 'xmlhttprequest-ts';
 //import {Http, Headers, HTTP_PROVIDERS} from 'angular2/http';
 import axios from 'axios'
@@ -193,20 +194,20 @@ export default class Org extends SfdxCommand {
         sourceInstanceUrl = `${participantConnection.PDRI__Refresh_Token__c}`;
   
         destinationRecordId = ``;  //Does not exist for scratch org, no connection record
-        destinationRefreshToken = `${scratchConn.getAuthInfo().getFields().refreshToken}`;
-        destinationAccessToken = `${scratchConn.getAuthInfo().getFields().accessToken}`;
+        destinationRefreshToken = `${scratchConn.getAuthInfo().getConnectionOptions().refreshToken}`;
+        destinationAccessToken = `${scratchConn.getAuthInfo().getConnectionOptions().accessToken}`;
         destinationOrgType = `Sandbox`;
         destinationOrgId = `${this.org.getOrgId()}`;
-        destinationUserId = `${scratchConn.getAuthInfo().getFields().userId}`;
-        destinationInstanceUrl = `${scratchConn.getAuthInfo().getFields().instanceUrl}`;
+        destinationUserId = `${scratchConn.getAuthInfo().getConnectionOptions().userId}`;
+        destinationInstanceUrl = `${scratchConn.getAuthInfo().getConnectionOptions().instanceUrl}`;
       } else if( destinationFlag !== undefined ) {
         sourceRecordId = ``;  //Does not exist for scratch org, no connection record
-        sourceRefreshToken = `${scratchConn.getAuthInfo().getFields().refreshToken}`;
-        sourceAccessToken = `${scratchConn.getAuthInfo().getFields().accessToken}`;
+        sourceRefreshToken = `${scratchConn.getAuthInfo().getConnectionOptions().refreshToken}`;
+        sourceAccessToken = `${scratchConn.getAuthInfo().getConnectionOptions().accessToken}`;
         sourceOrgType = `Sandbox`;
         sourceOrgId = `${this.org.getOrgId()}`;
-        sourceUserId = `${scratchConn.getAuthInfo().getFields().userId}`;
-        sourceInstanceUrl = `${scratchConn.getAuthInfo().getFields().instanceUrl}`;
+        sourceUserId = `${scratchConn.getAuthInfo().getConnectionOptions().userId}`;
+        sourceInstanceUrl = `${scratchConn.getAuthInfo().getConnectionOptions().instanceUrl}`;
 
         destinationRecordId = `${participantConnection.Id}`;
         destinationRefreshToken = `${participantConnection.PDRI__Refresh_Token__c}`;
@@ -217,20 +218,21 @@ export default class Org extends SfdxCommand {
       }
     } else {
       sourceRecordId = ``; //Since using dev hub org connection info from DX, does not exist. If a problem could use control org connection.
-      sourceRefreshToken = `${hubConn.getAuthInfo().getFields().refreshToken}`;
-      sourceAccessToken = `${hubConn.getAuthInfo().getFields().accessToken}`;
+      sourceRefreshToken = `${hubConn.getAuthInfo().getConnectionOptions().refreshToken}`;
+      sourceAccessToken = `${hubConn.getAuthInfo().getConnectionOptions().accessToken}`;
+
       sourceOrgType = `Production`;
       sourceOrgId = `${this.hubOrg.getOrgId()}`;
-      sourceUserId = `${hubConn.getAuthInfo().getFields().userId}`;
-      sourceInstanceUrl = `${hubConn.getAuthInfo().getFields().instanceUrl}`;
+      sourceUserId = `${hubConn.getAuthInfo().getConnectionOptions().userId}`;
+      sourceInstanceUrl = `${hubConn.getAuthInfo().getConnectionOptions().instanceUrl}`;
 
       destinationRecordId = ``;  //Does not exist for scratch org, no connection record
-      destinationRefreshToken = `${scratchConn.getAuthInfo().getFields().refreshToken}`;
-      destinationAccessToken = `${scratchConn.getAuthInfo().getFields().accessToken}`;
+      destinationRefreshToken = `${scratchConn.getAuthInfo().getConnectionOptions().refreshToken}`;
+      destinationAccessToken = `${scratchConn.getAuthInfo().getConnectionOptions().accessToken}`;
       destinationOrgType = `Sandbox`;
       destinationOrgId = `${this.org.getOrgId()}`;
-      destinationUserId = `${scratchConn.getAuthInfo().getFields().userId}`;
-      destinationInstanceUrl = `${scratchConn.getAuthInfo().getFields().instanceUrl}`;
+      destinationUserId = `${scratchConn.getAuthInfo().getConnectionOptions().userId}`;
+      destinationInstanceUrl = `${scratchConn.getAuthInfo().getConnectionOptions().instanceUrl}`;
     }
 
     //Retrieve the data set or deployment plan to deploy
@@ -303,7 +305,7 @@ export default class Org extends SfdxCommand {
     //Construct the dpeloyment request and make the callout to submit it
     this.ux.log(`Constructing deployment request.`);
 
-    const contextUserId = `${hubConn.getAuthInfo().getFields().userId}`;
+    const contextUserId = `${hubConn.getAuthInfo().getConnectionOptions().userId}`;
     const deploymentResultId = `${insertResult[0].id}`;
 
     const param = { 'deploymentResultId' : `${deploymentResultId}`, 
@@ -312,16 +314,14 @@ export default class Org extends SfdxCommand {
       'submitterUserFullName' : 'Daniel Rudman',
       'packageNameSpace' : 'PDRI__',
       'deploymentEntityIds' : [{ 'deploymentEntityId' : `${deploymentEntityId}` }],
-      'sourceOrgConnection' : { 'recordId' : `${sourceRecordId}`, 
-        //'refreshToken' : `${sourceRefreshToken}`, 
-        'accessToken' : `${sourceAccessToken}`, 
+      'sourceOrgConnection' : { 'recordId' : `${sourceRecordId}`,
+        'accessToken' : `${sourceAccessToken}`,
         'orgType' : `${sourceOrgType}`, 
         'orgId' : `${sourceOrgId}`, 
         'userId' : `${sourceUserId}`, 
         'instanceUrl' : `${sourceInstanceUrl}` },
       'targetOrgConnection' : { 'recordId' : `${destinationRecordId}`, 
-        //'refreshToken' : `${destinationRefreshToken}`, 
-        'accessToken' : `${destinationAccessToken}`, 
+        'accessToken' : `${destinationAccessToken}`,
         'orgType' : `${destinationOrgType}`, 
         'orgId' : `${destinationOrgId}`, 
         'userId' : `${destinationUserId}`, 
@@ -337,13 +337,13 @@ export default class Org extends SfdxCommand {
 
     const data = JSON.stringify(param);
 
-    this.ux.log(`Data: ${data}`);
+    //this.ux.log(`Data: ${data}`);
 
     const https = require('https');
     const path = datasetFlag !== undefined ? '/dataset/deploy' : '/plan/deploy';
 
     this.ux.log(`Path: ${path}`);
-    this.ux.log(`Host: deployer.dev.prodly.co`);
+    this.ux.log(`Host: deployer.prodly.co`);
 
     let axiosConfig = {
       headers: {
@@ -351,7 +351,7 @@ export default class Org extends SfdxCommand {
       }
     };
 
-    axios.post('https://deployer.dev.prodly.co/dataset/deploy', data, axiosConfig)
+    axios.post('https://deployer.prodly.co/dataset/deploy', data, axiosConfig)
     .then((res) => {
       this.ux.log(`Response status: ${res.status}`);
       this.ux.log(JSON.stringify(res.data, null, '\t'));
