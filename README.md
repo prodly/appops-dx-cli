@@ -22,7 +22,7 @@ $ npm install -g mooverdxcli
 $ mooverdxcli COMMAND
 running command...
 $ mooverdxcli (-v|--version|version)
-mooverdxcli/0.0.9 darwin-x64 node-v11.6.0
+mooverdxcli/1.17.0 darwin-x64 node-v11.6.0
 $ mooverdxcli --help [COMMAND]
 USAGE
   $ mooverdxcli COMMAND
@@ -69,7 +69,7 @@ EXAMPLES
   hub, control org. Long param names.
 ```
 
-_See code: [src/commands/moover/deploy.ts](https://github.com/prodly/mooverdxcli/blob/v0.0.9/src/commands/moover/deploy.ts)_
+_See code: [src/commands/moover/deploy.ts](https://github.com/prodly/mooverdxcli/blob/v1.17.0/src/commands/moover/deploy.ts)_
 <!-- commandsstop -->
 <!-- debugging-your-plugin -->
 # Debugging your plugin
