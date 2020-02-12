@@ -22,7 +22,7 @@ $ npm install -g mooverdxcli
 $ mooverdxcli COMMAND
 running command...
 $ mooverdxcli (-v|--version|version)
-mooverdxcli/1.18.0 darwin-x64 node-v11.6.0
+mooverdxcli/1.19.0 darwin-x64 node-v11.6.0
 $ mooverdxcli --help [COMMAND]
 USAGE
   $ mooverdxcli COMMAND
@@ -30,26 +30,41 @@ USAGE
 ```
 <!-- usagestop -->
 <!-- commands -->
-* [`mooverdxcli moover:deploy [SOURCE]`](#mooverdxcli-mooverdeploy-source)
+* [`mooverdxcli moover:deploy [-s <string>] [-d <string>] [-t <string>] [-p <string>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`](#mooverdxcli-mooverdeploy--s-string--d-string--t-string--p-string--v-string--u-string---apiversion-string---json---loglevel-tracedebuginfowarnerrorfataltracedebuginfowarnerrorfatal)
 
-## `mooverdxcli moover:deploy [SOURCE]`
+## `mooverdxcli moover:deploy [-s <string>] [-d <string>] [-t <string>] [-p <string>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`
 
 Launches a Moover relational data deployment for a scratch org.
 
 ```
 USAGE
-  $ mooverdxcli moover:deploy [SOURCE]
+  $ mooverdxcli moover:deploy [-s <string>] [-d <string>] [-t <string>] [-p <string>] [-v <string>] [-u <string>] 
+  [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]
 
 OPTIONS
-  -d, --destination=destination                    destination connection name or record id
-  -p, --plan=plan                                  deployment plan to deploy name or record id
-  -s, --source=source                              source connection name or record id
-  -t, --dataset=dataset                            data set to deploy name or record id
-  -u, --targetusername=targetusername              username or alias for the target org; overrides default target org
-  -v, --targetdevhubusername=targetdevhubusername  username or alias for the dev hub org; overrides default dev hub org
-  --apiversion=apiversion                          override the api version used for api requests made by this command
-  --json                                           format output as json
-  --loglevel=(trace|debug|info|warn|error|fatal)   logging level for this command invocation
+  -d, --destination=destination                                                     destination connection name or
+                                                                                    record id
+
+  -p, --plan=plan                                                                   deployment plan to deploy name or
+                                                                                    record id
+
+  -s, --source=source                                                               source connection name or record id
+
+  -t, --dataset=dataset                                                             data set to deploy name or record id
+
+  -u, --targetusername=targetusername                                               username or alias for the target
+                                                                                    org; overrides default target org
+
+  -v, --targetdevhubusername=targetdevhubusername                                   username or alias for the dev hub
+                                                                                    org; overrides default dev hub org
+
+  --apiversion=apiversion                                                           override the api version used for
+                                                                                    api requests made by this command
+
+  --json                                                                            format output as json
+
+  --loglevel=(trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL)  [default: warn] logging level for
+                                                                                    this command invocation
 
 EXAMPLES
   $ sfdx moover:deploy -u FixesScratchOrg -v MainDevHub
@@ -69,7 +84,7 @@ EXAMPLES
   hub, control org. Long param names.
 ```
 
-_See code: [src/commands/moover/deploy.ts](https://github.com/prodly/mooverdxcli/blob/v1.18.0/src/commands/moover/deploy.ts)_
+_See code: [src/commands/moover/deploy.ts](https://github.com/prodly/mooverdxcli/blob/v1.19.0/src/commands/moover/deploy.ts)_
 <!-- commandsstop -->
 <!-- debugging-your-plugin -->
 # Debugging your plugin
