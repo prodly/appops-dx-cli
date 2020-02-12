@@ -1,7 +1,7 @@
 {
   "name": "mooverdxcli",
   "description": "The CLI for Moover DX.",
-  "version": "1.17.0",
+  "version": "1.18.0",
   "author": "Prodly Inc.",
   "bugs": "https://github.com/prodly/mooverdxcli/issues",
   "dependencies": {
@@ -13,6 +13,8 @@
     "axios": "^0.18.0",
     "handlebars": "^4.1.2",
     "lodash": "^4.17.15",
+    "npm-check-updates": "^3.1.20",
+    "tsconfig": "^7.0.0",
     "tslib": "1"
   },
   "devDependencies": {
