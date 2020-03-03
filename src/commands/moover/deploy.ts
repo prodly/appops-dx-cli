@@ -55,11 +55,14 @@ export default class Org extends SfdxCommand {
     const datasetFlag = this.flags.dataset;
     const planFlag = this.flags.plan;
     const isOrgSpecified = sourceFlag !== undefined || destinationFlag !== undefined;
+    const trailSlashRegex = /\/$/;
+
     this.ux.log("Source connection flag: " + sourceFlag);
     this.ux.log("Destination connection flag: " + destinationFlag);
     this.ux.log("Data set flag: " + datasetFlag);
     this.ux.log("Deployment plan flag: " + planFlag);
     this.ux.log("Connections specified: " + isOrgSpecified);
+
     if (sourceFlag !== undefined && destinationFlag !== undefined) {
         throw new core.SfdxError(messages.getMessage('errorSourceAndTargetFlags', []));
     }
@@ -151,7 +154,7 @@ export default class Org extends SfdxCommand {
             destinationOrgType = `Sandbox`;
             destinationOrgId = `${this.org.getOrgId()}`;
             destinationUserId = `${scratchConn.getConnectionOptions().userId}`;
-            destinationInstanceUrl = `${scratchConn.getConnectionOptions().instanceUrl}`;
+            destinationInstanceUrl = `${scratchConn.getConnectionOptions().instanceUrl}`.replace(trailSlashRegex, "");
         }
         else if (destinationFlag !== undefined) {
             sourceRecordId = ``; //Does not exist for scratch org, no connection record
@@ -160,7 +163,7 @@ export default class Org extends SfdxCommand {
             sourceOrgType = `Sandbox`;
             sourceOrgId = `${this.org.getOrgId()}`;
             sourceUserId = `${scratchConn.getConnectionOptions().userId}`;
-            sourceInstanceUrl = `${scratchConn.getConnectionOptions().instanceUrl}`;
+            sourceInstanceUrl = `${scratchConn.getConnectionOptions().instanceUrl}`.replace(trailSlashRegex, "");
 
             destinationRecordId = `${participantConnection.Id}`;
             //destinationRefreshToken = `${participantConnection.PDRI__Refresh_Token__c}`;
@@ -168,7 +171,7 @@ export default class Org extends SfdxCommand {
             destinationOrgType = `${participantConnection.PDRI__Org_Type__c}`;
             destinationOrgId = `${participantConnection.PDRI__OrganizationId__c}`;
             destinationUserId = `${participantConnection.PDRI__User_Id__c}`;
-            destinationInstanceUrl = `${participantConnection.PDRI__Instance_URL__cc}`;
+            destinationInstanceUrl = `${participantConnection.PDRI__Instance_URL__c}`;
         }
     }
     else {
@@ -180,13 +183,13 @@ export default class Org extends SfdxCommand {
         sourceOrgType = `Production`;
         sourceOrgId = `${this.hubOrg.getOrgId()}`;
         sourceUserId = `${hubConn.getConnectionOptions().userId}`;
-        sourceInstanceUrl = `${hubConn.getConnectionOptions().instanceUrl}`;
+        sourceInstanceUrl = `${hubConn.getConnectionOptions().instanceUrl}`.replace(trailSlashRegex, "");
         destinationRecordId = ``; //Does not exist for scratch org, no connection record
         destinationAccessToken = `${scratchConn.getConnectionOptions().accessToken}`;
         destinationOrgType = `Sandbox`;
         destinationOrgId = `${this.org.getOrgId()}`;
         destinationUserId = `${scratchConn.getConnectionOptions().userId}`;
-        destinationInstanceUrl = `${scratchConn.getConnectionOptions().instanceUrl}`;
+        destinationInstanceUrl = `${scratchConn.getConnectionOptions().instanceUrl}`.replace(trailSlashRegex, "");
     }
     //Retrieve the data set or deployment plan to deploy
     this.ux.log(`Retrieving data set or deployment plan to deploy.`);
@@ -215,17 +218,17 @@ export default class Org extends SfdxCommand {
         const isId = orgIdRegxp.test(planFlag);
         let queryData;
         if (isId) {
-            queryData = `Select Id, Name from PDRI__Deployment_Plan__c where Id = '` + datasetFlag + `' order by lastmodifieddate desc limit 1`;
+            queryData = `Select Id, Name from PDRI__Deployment_Plan__c where Id = '` + planFlag + `' order by lastmodifieddate desc limit 1`;
         }
         else {
-            queryData = `Select Id, Name from PDRI__Deployment_Plan__c where Name = '` + datasetFlag + `' order by lastmodifieddate desc limit 1`;
+            queryData = `Select Id, Name from PDRI__Deployment_Plan__c where Name = '` + planFlag + `' order by lastmodifieddate desc limit 1`;
         }
         this.ux.log("Running query: " + queryData);
         // Query the org
         const result = await hubConn.query(queryData);
         // The output and --json will automatically be handled for you.
         if (!result.records || result.records.length <= 0) {
-            throw new core.SfdxError(messages.getMessage('errorNoDeploymentPlanFound', [datasetFlag]));
+            throw new core.SfdxError(messages.getMessage('errorNoDeploymentPlanFound', [planFlag]));
         }
         deployDeploymentPlan = result.records[0];
         deploymentEntityId = `${deployDeploymentPlan.Id}`;
@@ -267,11 +270,20 @@ export default class Org extends SfdxCommand {
             'orgId': `${controlConnection.PDRI__OrganizationId__c}`,
             'userId': `${controlConnection.PDRI__User_Id__c}`,
             'instanceUrl': `${controlConnection.PDRI__Instance_URL__c}` } };
-    this.ux.log("Invoking deployment request with the Moover service");
+    this.ux.log("Invoking deployment request with the Prodly AppOps service");
     const data = JSON.stringify(param);
     //this.ux.log(`Data: ${data}`);
 
-    const path = datasetFlag !== undefined ? '/dataset/deploy' : '/plan/deploy';
+    let path;
+
+    if (datasetFlag !== undefined) {
+        path = '/dataset/deploy';
+    } else if (planFlag !== undefined) {
+        path = '/plan/deploy';
+    } else {
+        path = '/dataset/deploy';
+    }
+
     this.ux.log(`Path: ${path}`);
     this.ux.log(`Host: deployer.prodly.co`);
     let axiosConfig = {
@@ -279,7 +291,7 @@ export default class Org extends SfdxCommand {
             'Content-Type': 'application/json',
         }
     };
-    axios_1.default.post('https://deployer.prodly.co/dataset/deploy', data, axiosConfig)
+    axios_1.default.post(`https://deployer.prodly.co${path}`, data, axiosConfig)
         .then((res) => {
         this.ux.log(`Response status: ${res.status}`);
         this.ux.log(JSON.stringify(res.data, null, '\t'));
