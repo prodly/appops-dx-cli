@@ -1,7 +1,7 @@
 {
   "name": "mooverdxcli",
   "description": "The CLI for Moover DX.",
-  "version": "1.21.0",
+  "version": "1.22.0",
   "author": "Prodly Inc.",
   "bugs": "https://github.com/prodly/mooverdxcli/issues",
   "dependencies": {
