@@ -16,13 +16,15 @@ The CLI for Prodly AppOps DX.
 * [Debugging your plugin](#debugging-your-plugin)
 <!-- tocstop -->
 <!-- install -->
-<!-- usage -->
 ```sh-session
 $ sfdx plugins:install mooverdxcli
+```
+<!-- usage -->
+```sh-session
 $ mooverdxcli COMMAND
 running command...
 $ mooverdxcli (-v|--version|version)
-mooverdxcli/1.21.0 darwin-x64 node-v11.6.0
+mooverdxcli/1.22.0 darwin-x64 node-v11.6.0
 $ mooverdxcli --help [COMMAND]
 USAGE
   $ mooverdxcli COMMAND
@@ -84,7 +86,7 @@ EXAMPLES
   hub, control org. Long param names.
 ```
 
-_See code: [src/commands/moover/deploy.ts](https://github.com/prodly/mooverdxcli/blob/v1.21.0/src/commands/moover/deploy.ts)_
+_See code: [src/commands/moover/deploy.ts](https://github.com/prodly/mooverdxcli/blob/v1.22.0/src/commands/moover/deploy.ts)_
 <!-- commandsstop -->
 <!-- debugging-your-plugin -->
 # Debugging your plugin
