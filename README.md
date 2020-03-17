@@ -1,7 +1,7 @@
 mooverdxcli
 ===========
 
-The CLI for Moover DX.
+The CLI for Prodly AppOps DX.
 
 [![Version](https://img.shields.io/npm/v/mooverdxcli.svg)](https://npmjs.org/package/mooverdxcli)
 [![CircleCI](https://circleci.com/gh/prodly/mooverdxcli/tree/master.svg?style=shield)](https://circleci.com/gh/prodly/mooverdxcli/tree/master)
@@ -18,7 +18,7 @@ The CLI for Moover DX.
 <!-- install -->
 <!-- usage -->
 ```sh-session
-$ npm install -g mooverdxcli
+$ sfdx plugins:install mooverdxcli
 $ mooverdxcli COMMAND
 running command...
 $ mooverdxcli (-v|--version|version)
@@ -34,7 +34,7 @@ USAGE
 
 ## `mooverdxcli moover:deploy [-s <string>] [-d <string>] [-t <string>] [-p <string>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`
 
-Launches a Moover relational data deployment for a scratch org.
+Launches a Prodly AppOps relational data deployment for a scratch org.
 
 ```
 USAGE
