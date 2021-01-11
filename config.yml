@@ -42,7 +42,7 @@ jobs:
 
 workflows:
   version: 2
-  "mooverdxcli3":
+  "appopsdxcli3":
     jobs:
       - node-latest
       - node-8

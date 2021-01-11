@@ -1,5 +1,5 @@
 {
-  "commandDescription": "Launches a Moover relational data deployment for a scratch org.",
+  "commandDescription": "Launches an AppOps relational data deployment for a scratch org.",
   "sourceFlagDescription": "source connection name or record id",
   "destinationFlagDescription": "destination connection name or record id",
   "dataSetFlagDescription": "data set to deploy name or record id",

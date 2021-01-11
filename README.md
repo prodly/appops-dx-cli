@@ -1,47 +1,47 @@
-mooverdxcli
+appopsdxcli
 ===========
 
 The CLI for Prodly AppOps DX.
 
-[![Version](https://img.shields.io/npm/v/mooverdxcli.svg)](https://npmjs.org/package/mooverdxcli)
-[![CircleCI](https://circleci.com/gh/prodly/mooverdxcli/tree/master.svg?style=shield)](https://circleci.com/gh/prodly/mooverdxcli/tree/master)
-[![Appveyor CI](https://ci.appveyor.com/api/projects/status/github/prodly/mooverdxcli?branch=master&svg=true)](https://ci.appveyor.com/project/heroku/mooverdxcli/branch/master)
-[![Codecov](https://codecov.io/gh/prodly/mooverdxcli/branch/master/graph/badge.svg)](https://codecov.io/gh/prodly/mooverdxcli)
-[![Greenkeeper](https://badges.greenkeeper.io/prodly/mooverdxcli.svg)](https://greenkeeper.io/)
-[![Known Vulnerabilities](https://snyk.io/test/github/prodly/mooverdxcli/badge.svg)](https://snyk.io/test/github/prodly/mooverdxcli)
-[![Downloads/week](https://img.shields.io/npm/dw/mooverdxcli.svg)](https://npmjs.org/package/mooverdxcli)
-[![License](https://img.shields.io/npm/l/mooverdxcli.svg)](https://github.com/prodly/mooverdxcli/blob/master/package.json)
+[![Version](https://img.shields.io/npm/v/appopsdxcli.svg)](https://npmjs.org/package/appopsdxcli)
+[![CircleCI](https://circleci.com/gh/prodly/appopsdxcli/tree/master.svg?style=shield)](https://circleci.com/gh/prodly/appopsdxcli/tree/master)
+[![Appveyor CI](https://ci.appveyor.com/api/projects/status/github/prodly/appopsdxcli?branch=master&svg=true)](https://ci.appveyor.com/project/heroku/appopsdxcli/branch/master)
+[![Codecov](https://codecov.io/gh/prodly/appopsdxcli/branch/master/graph/badge.svg)](https://codecov.io/gh/prodly/appopsdxcli)
+[![Greenkeeper](https://badges.greenkeeper.io/prodly/appopsdxcli.svg)](https://greenkeeper.io/)
+[![Known Vulnerabilities](https://snyk.io/test/github/prodly/appopsdxcli/badge.svg)](https://snyk.io/test/github/prodly/appopsdxcli)
+[![Downloads/week](https://img.shields.io/npm/dw/appopsdxcli.svg)](https://npmjs.org/package/appopsdxcli)
+[![License](https://img.shields.io/npm/l/appopsdxcli.svg)](https://github.com/prodly/appopsdxcli/blob/master/package.json)
 
 <!-- toc -->
 * [Debugging your plugin](#debugging-your-plugin)
 <!-- tocstop -->
 <!-- install -->
 ```sh-session
-$ sfdx plugins:install mooverdxcli
+$ sfdx plugins:install appopsdxcli
 ```
 <!-- usage -->
 ```sh-session
-$ npm install -g mooverdxcli
-$ mooverdxcli COMMAND
+$ npm install -g appopsdxcli
+$ appopsdxcli COMMAND
 running command...
-$ mooverdxcli (-v|--version|version)
-mooverdxcli/1.23.0 darwin-x64 node-v11.6.0
-$ mooverdxcli --help [COMMAND]
+$ appopsdxcli (-v|--version|version)
+appopsdxcli/1.1.0 darwin-x64 node-v11.6.0
+$ appopsdxcli --help [COMMAND]
 USAGE
-  $ mooverdxcli COMMAND
+  $ appopsdxcli COMMAND
 ...
 ```
 <!-- usagestop -->
 <!-- commands -->
-* [`mooverdxcli moover:deploy [-s <string>] [-d <string>] [-t <string>] [-p <string>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`](#mooverdxcli-mooverdeploy--s-string--d-string--t-string--p-string--v-string--u-string---apiversion-string---json---loglevel-tracedebuginfowarnerrorfataltracedebuginfowarnerrorfatal)
+* [`appopsdxcli appops:deploy [-s <string>] [-d <string>] [-t <string>] [-p <string>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`](#appopsdxcli-appopsdeploy--s-string--d-string--t-string--p-string--v-string--u-string---apiversion-string---json---loglevel-tracedebuginfowarnerrorfataltracedebuginfowarnerrorfatal)
 
-## `mooverdxcli moover:deploy [-s <string>] [-d <string>] [-t <string>] [-p <string>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`
+## `appopsdxcli appops:deploy [-s <string>] [-d <string>] [-t <string>] [-p <string>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`
 
-Launches a Moover relational data deployment for a scratch org.
+Launches an AppOps relational data deployment for a scratch org.
 
 ```
 USAGE
-  $ mooverdxcli moover:deploy [-s <string>] [-d <string>] [-t <string>] [-p <string>] [-v <string>] [-u <string>] 
+  $ appopsdxcli appops:deploy [-s <string>] [-d <string>] [-t <string>] [-p <string>] [-v <string>] [-u <string>] 
   [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]
 
 OPTIONS
@@ -70,24 +70,24 @@ OPTIONS
                                                                                     this command invocation
 
 EXAMPLES
-  $ sfdx moover:deploy -u FixesScratchOrg -v MainDevHub
+  $ sfdx appops:deploy -u FixesScratchOrg -v MainDevHub
      Command output... deploying from the dev hub, the control org, to the scratch org.
      Command output...
   
-  $ sfdx moover:deploy --targetusername test-utxac7gbati9@example.com --targetdevhubusername jsmith@acme.com 
+  $ sfdx appops:deploy --targetusername test-utxac7gbati9@example.com --targetdevhubusername jsmith@acme.com 
      Command output... deploying from the dev hub, the control org, to the scratch org. Long param names.
   
-  $ sfdx moover:deploy -u test-utxac7gbati9@example.com -v jsmith@acme.com -d "UAT Sandbox Connection"
+  $ sfdx appops:deploy -u test-utxac7gbati9@example.com -v jsmith@acme.com -d "UAT Sandbox Connection"
      Command output... deploying from the scratch org to the UAT sandbox, using the named connection record in the dev 
   hub, control org.
   
-  $ sfdx moover:deploy --targetusername test-utxac7gbati9@example.com --targetdevhubusername jsmith@acme.com --source 
+  $ sfdx appops:deploy --targetusername test-utxac7gbati9@example.com --targetdevhubusername jsmith@acme.com --source 
   "UAT Sandbox Connection"
      Command output... deploying to the scratch org from the UAT sandbox, using the named connection record in the dev 
   hub, control org. Long param names.
 ```
 
-_See code: [src/commands/moover/deploy.ts](https://github.com/prodly/mooverdxcli/blob/v1.23.0/src/commands/moover/deploy.ts)_
+_See code: [src/commands/appops/deploy.ts](https://github.com/prodly/appopsdxcli/blob/v1.1.0/src/commands/appops/deploy.ts)_
 <!-- commandsstop -->
 <!-- debugging-your-plugin -->
 # Debugging your plugin

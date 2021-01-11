@@ -1,16 +1,16 @@
 {
-  "name": "mooverdxcli",
-  "description": "The CLI for Moover DX.",
-  "version": "1.23.0",
+  "name": "appopsdxcli",
+  "description": "The Prodly AppOps CLI for Salesforce DX.",
+  "version": "1.1.0",
   "author": "Prodly Inc.",
-  "bugs": "https://github.com/prodly/mooverdxcli/issues",
+  "bugs": "https://github.com/prodly/appopsdxcli/issues",
   "dependencies": {
     "@oclif/command": "1",
     "@oclif/config": "1",
     "@oclif/errors": "1",
     "@salesforce/command": "^3.0.0",
     "@salesforce/core": "^2.2.0",
-    "axios": "^0.18.0",
+    "axios": "^0.21.1",
     "handlebars": "^4.3.2",
     "lodash": "^4.17.15",
     "npm-check-updates": "^3.1.20",
@@ -42,7 +42,7 @@
     "/npm-shrinkwrap.json",
     "/oclif.manifest.json"
   ],
-  "homepage": "https://github.com/prodly/mooverdxcli",
+  "homepage": "https://github.com/prodly/appopsdxcli",
   "keywords": [
     "sfdx-plugin"
   ],
@@ -58,7 +58,7 @@
       "@oclif/plugin-help"
     ]
   },
-  "repository": "prodly/mooverdxcli",
+  "repository": "prodly/appopsdxcli",
   "scripts": {
     "postpack": "rm -f oclif.manifest.json npm-shrinkwrap.json",
     "posttest": "tslint -p test -t stylish",
