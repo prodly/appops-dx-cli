@@ -43,6 +43,7 @@ export default class Org extends SfdxCommand {
   };
 
   // Comment this out if your command does not require an org username
+  //https://developer.salesforce.com/docs/atlas.en-us.sfdx_cli_plugins.meta/sfdx_cli_plugins/cli_plugins_customize_properties_static.htm
   protected static requiresUsername = true;
 
   // Comment this out if your command does not support a hub org username
@@ -87,7 +88,6 @@ export default class Org extends SfdxCommand {
     let dataSetId;
     let deploymentPlanId;
 
-
     /*this.ux.log(`refresh token: ${scratchConn.getConnectionOptions().refreshToken}`);
     this.ux.log(`access token: ${scratchConn.getConnectionOptions().accessToken}`);
     this.ux.log(`username: ${scratchConn.getConnectionOptions().username}`);
@@ -101,6 +101,11 @@ export default class Org extends SfdxCommand {
     //2. Source instance and dx org param are provided, deploy from source instance to dx org instance
     //3. Destination instance and dx org param are provided, deploy from dx org instance to destination instance
     //4. Only dx org param is provided, deploy from devhub/control org to the destination instance.
+    //
+    //Any auto managed instances, and its associated auto created connections, will only contain a short lived refresh token
+    //This means that for any subsequent deployments the refresh token needs to be updated with the latest
+    //Which can only happen if we have a provided target username parameter for the instance org
+    //So only the source or destination instance can be an auto managed
 
     //Set source mamanaged instance
     if (sourceFlag !== undefined) {
@@ -108,12 +113,27 @@ export default class Org extends SfdxCommand {
         this.ux.log("Source managed instance parameter is specified: ", sourceFlag);
         //Source is a managed instance, use the managed instance ID
         sourceInstanceId = sourceFlag;
+
+        /*The below logic can be uncommented if/when we want to support updating the refresh token for the source or destination connection
+        //when both source and destination are passed in as instance params, but the targetusername matches on of them
+        //
+        //Check if a managed instance exist with the same instance ID
+        var managedInstance = await this.getManagedInstanceByInstanceId( sourceInstanceId, hubConn );  
+        this.ux.log("Retrieved managed instance: ", managedInstance);       
+        if( managedInstance ) {
+            //If exists, use that managed instance ID
+            this.ux.log("Managed instance found with connection ID: " + managedInstance.connectionId);
+
+            //Update the connection with the latest access token
+            this.ux.log("Updating the connection with the latest access token");
+            await this.updateConnection(managedInstance.connectionId, this.org, hubConn);
+        }*/
     } else if (isOrgSpecified) {
         //Source is a DX managed org
         this.ux.log("Source managed instance parameter is not specified, finding or creating managed instance by org ID: ", this.org.getOrgId());
 
         //Check if a managed instance exist with the same org ID
-        var managedInstance = await this.getManagedInstance( this.org.getOrgId(), hubConn );   
+        var managedInstance = await this.getManagedInstanceByOrgId( this.org.getOrgId(), hubConn );   
         this.ux.log("Retrieved managed instance: ", managedInstance);       
         if( managedInstance ) {
             //If exists, use that managed instance ID
@@ -146,7 +166,7 @@ export default class Org extends SfdxCommand {
         }     
     } else {
         //Source is the dev hub/control org
-        var managedInstance = await this.getManagedInstance( hubConn.getConnectionOptions().orgId, hubConn );   
+        var managedInstance = await this.getManagedInstanceByOrgId( hubConn.getConnectionOptions().orgId, hubConn );   
         this.ux.log("Retrieved managed instance ID for the control org: ", managedInstance.id); 
 
         if( !managedInstance ) {
@@ -165,8 +185,8 @@ export default class Org extends SfdxCommand {
         this.ux.log("Destination managed instance parameter is not specified, finding or creating managed instance by org ID: ", this.org.getOrgId());
 
         //Check if a managed instance exist with the same org ID
-        var managedInstance = await this.getManagedInstance( this.org.getOrgId(), hubConn );   
-        this.ux.log("Retrieved managed instance: ", managedInstance);       
+        var managedInstance = await this.getManagedInstanceByOrgId( this.org.getOrgId(), hubConn );   
+        this.ux.log("Retrieved managed instance: ", managedInstance);
         if( managedInstance ) {
             //If exists, use that managed instance ID
             this.ux.log("Managed instance found, using it, with ID: " + managedInstance.id);
@@ -199,7 +219,9 @@ export default class Org extends SfdxCommand {
     }
     
     this.ux.log("Refreshing org session auth");
-    await this.org.refreshAuth();
+    try {
+        await this.org.refreshAuth();
+    } catch{  console.log("Target username not valid or not specified, refresh failed"); }
 
     //Retrieve the data set or deployment plan to deploy
     this.ux.log(`Retrieving data set or deployment plan to deploy.`);
@@ -241,7 +263,6 @@ export default class Org extends SfdxCommand {
     this.ux.log(`Invoking deployment.`);
 
     let path = '/services/apexrest/PDRI/v1/instances/' + destinationInstanceId + '/deploy';
-    let jobId = null;
 
     let dataSetIdWrapper = {
         label : "",
@@ -275,19 +296,17 @@ export default class Org extends SfdxCommand {
         url : path
     }
 
-    await hubConn.request(request, function(err, res) {
+    return await hubConn.request(request, function(err, res) {
         if (err) { 
             throw new core.SfdxError(err); 
         }
         console.log("Deploy response: ", res);
         let jobsWrapper : Jobs = JSON.parse( res );
         console.log("parsed job wrapper");
-        jobId = jobsWrapper.jobs[0].id;
+        let jobId = jobsWrapper.jobs[0].id;
         console.log("Job id: ", jobId);
+        return jobId;
     });
-
-    return jobId;
-    
   }  
 
   async getDeploymentEntityId(dataEntityFlag,  
@@ -336,12 +355,13 @@ export default class Org extends SfdxCommand {
     return result.records[0].Id;
   }
 
-  async getManagedInstance(orgId, hubConn) {
+  async getManagedInstanceByOrgId(orgId, hubConn) {
     this.ux.log(`Retrieving the managed instance ID for org ${orgId}.`);
 
     let path = '/services/apexrest/PDRI/v1/instances';
-    let managedInstance = null;
 
+    let managedInstance = undefined;
+    
     await hubConn.request(`${hubConn.instanceUrl}${path}`, function(err, res) {
         if (err) { 
             throw new core.SfdxError(err); 
@@ -359,6 +379,26 @@ export default class Org extends SfdxCommand {
     return managedInstance;
   }  
 
+  /*async getManagedInstanceByInstanceId(instanceId, hubConn) {
+    this.ux.log(`Retrieving the managed instance ID for connection ID ${connectionId}.`);
+
+    let path = '/services/apexrest/PDRI/v1/instances';
+
+    return await hubConn.request(`${hubConn.instanceUrl}${path}`, function(err, res) {
+        if (err) { 
+            throw new core.SfdxError(err); 
+        }
+        console.log("Get managed instance response: ", JSON.stringify(res));
+        let managedInstances : ManagedInstances = JSON.parse( JSON.stringify(res) );
+        managedInstances.instances.forEach( (instance) => {
+            if( instance.id === instanceId ) {
+                console.log("Found matching instance: ", instance);
+                return instance;
+            }
+        });
+    });
+  }*/
+
   async createConnection(org, hubConn) {
     const trailSlashRegex = /\/$/;
 
@@ -371,40 +411,36 @@ export default class Org extends SfdxCommand {
         PDRI__User_Id__c : org.getConnection().getConnectionOptions().userId,
         PDRI__Username__c : org.getUsername()
     };
-    
-    let connectionId = null;
 
-    await hubConn.create("PDRI__Connection__c", connection, function(err, res) {
+    let connectionId = undefined;
+
+    connectionId = await hubConn.create("PDRI__Connection__c", connection, function(err, res) {
         if (err) { 
             throw new core.SfdxError(err); 
         }
         console.log("Create connection response: ", JSON.stringify(res));
         connectionId = res.id;
     });
-    
-    console.log("Returning connection id: ", connectionId);
-    return connectionId;
+
+    console.log("Returning connection id: ", connectionId.id);
+    return connectionId.id;
   }
   
   async updateConnection(connectionId, org, hubConn) {
     let connection = { Id : connectionId, 
         PDRI__Access_Token__c : org.getConnection().getConnectionOptions().accessToken };
 
-    await hubConn.update("PDRI__Connection__c", connection, function(err, res) {
+    return await hubConn.update("PDRI__Connection__c", connection, function(err, res) {
         if (err) { 
             throw new core.SfdxError(err); 
         }
         console.log("Update connection response: ", JSON.stringify(res));
-
     });
-    
-    return '';
   }   
 
   async manageInstance(orgId, connectionId, hubConn) {
     this.ux.log(`Managing instance for org ID ${orgId}.`);
 
-    let jobId = null;
     let path = '/services/apexrest/PDRI/v1/instances';
 
     let request = {
@@ -413,14 +449,15 @@ export default class Org extends SfdxCommand {
         url : path
     }
 
+    let jobId = undefined;
+    
     await hubConn.request(request, function(err, res) {
         if (err) { 
             throw new core.SfdxError(err); 
         }
         
-        console.log("Manage instance response: ", res);
+        //console.log("Manage instance response: ", res);
         let jobsWrapper : Jobs = JSON.parse( res );
-        console.log("parsed job wrapper");
         jobId = jobsWrapper.jobs[0].id;
         console.log("Job id: ", jobId);
     });
@@ -447,25 +484,32 @@ export default class Org extends SfdxCommand {
         throw new core.SfdxError("Manage instance job did not complete within the allowed time.");
     }
 
+    //await this.delay(2000);
+
     let managedInstance : ManagedInstance = JSON.parse( completedJob.resultData );
 
     return managedInstance;
   }
 
   async jobCompletion(jobId, hubConn) {
-    let path = '/services/apexrest/PDRI/v1/jobs';
+    let path = '/services/apexrest/PDRI/v1/jobs/' + jobId;
+
     let completedJob = undefined;
 
     await hubConn.request(`${hubConn.instanceUrl}${path}`, function(err, res) {
         if (err) { 
             throw new core.SfdxError(err); 
         }
-        console.log("Job completion response: ", res);
+
         let jobsWrapper : Jobs = JSON.parse( res );
         let job = jobsWrapper.jobs[0];
+
+        //console.log("Job: ", job);
         
         if( job.status == 'COMPLETED' ) {
             completedJob = job;
+        } else {
+            completedJob = undefined;
         }
     });
 

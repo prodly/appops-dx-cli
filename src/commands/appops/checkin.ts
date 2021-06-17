@@ -69,6 +69,10 @@ export default class Org extends SfdxCommand {
         }
         this.ux.log(`Managed instance ID retrieved, using instance with id ${managedInstance.Id}`);
         mangedInstanceId =  managedInstance.Id;
+
+        //Update the connection with the latest access token
+        this.ux.log("Updating the connection with the latest access token");
+        await this.updateConnection(managedInstance.connectionId, this.org, hubConn);
     }
 
     //Perform the checkin
@@ -76,6 +80,18 @@ export default class Org extends SfdxCommand {
 
     return '{}';
   }
+
+  async updateConnection(connectionId, org, hubConn) {
+    let connection = { Id : connectionId, 
+        PDRI__Access_Token__c : org.getConnection().getConnectionOptions().accessToken };
+
+    return await hubConn.update("PDRI__Connection__c", connection, function(err, res) {
+        if (err) { 
+            throw new core.SfdxError(err); 
+        }
+        console.log("Update connection response: ", JSON.stringify(res));
+    });
+  }  
 
   async checkinInstance(mangedInstanceId, vcsToken, hubConn) {
     this.ux.log(`Performing checkin for managed instance with id ${mangedInstanceId}.`);

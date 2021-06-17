@@ -133,6 +133,8 @@ export default class Org extends SfdxCommand {
         versioningBody = ', "options": {"checkin": true, "checkout": true}'
     }
 
+    this.ux.log(`vcs-access-token ${vcsToken}.`); 
+
     let body = '{' + platformInstanceBody + versioningBody + '}';
 
     let request = {
@@ -184,7 +186,7 @@ export default class Org extends SfdxCommand {
   }
 
   async jobCompletion(jobId, hubConn) {
-    let path = '/services/apexrest/PDRI/v1/jobs';
+    let path = '/services/apexrest/PDRI/v1/jobs/' + jobId;
     let completedJob = undefined;
 
     await hubConn.request(`${hubConn.instanceUrl}${path}`, function(err, res) {
