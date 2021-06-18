@@ -10,6 +10,7 @@
     "listFlagDescription": "list all managed instances",
     "printFlagDescription": "print the managed instances in a standard format in addition to returning structured data",
     "manageFlagDescription": "manage a new instance",
+    "unmanageFlagDescription": "unmanage the specified instance",
     "versionFlagDescription": "version the new managed instance, branch created and data deployed to the org",
     "instanceFlagDescription": "managed instance ID on which to perform the action",
     "tokenFlagDescription": "access token for VCS access",
@@ -24,7 +25,6 @@
     "errorPrintFlagNoListFlag": "Print flag only specified with the list operation flag",
     "errorNoOrgWithManageFlags": "No org specified with the manage flag",
     "errorVersionFlagNoManageFlag": "Version flag only specified with the manage operation flag",
-    "tokenFlagDescription": "Access token must be provided for versioning operations",
     
     "errorManagedInstaceNotFound": "Managed instance not found for the specified org id"
   }

@@ -70,6 +70,11 @@ export default class Org extends SfdxCommand {
         this.ux.log(`Managed instance ID retrieved, using instance with id ${managedInstance.Id}`);
         mangedInstanceId =  managedInstance.Id;
 
+        this.ux.log("Refreshing org session auth");
+        try {
+            await this.org.refreshAuth();
+        } catch{  console.log("Target username not valid or not specified, refresh failed"); }
+
         //Update the connection with the latest access token
         this.ux.log("Updating the connection with the latest access token");
         await this.updateConnection(managedInstance.connectionId, this.org, hubConn);

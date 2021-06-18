@@ -21,6 +21,12 @@ export default class Org extends SfdxCommand {
   `,
   `$ sfdx appops:manage -m -u test-utxac7gbati9@example.com
   Manage and version the org associated with the target username under the AppOps account associated with the default DevHub control org.
+  `,
+  `$ sfdx appops:manage -x -u test-utxac7gbati9@example.com
+  Unmanage the instance associated with the target username under the AppOps account associated with the default DevHub control org.
+  `,
+  `$ sfdx appops:manage -x -i 6a4412b7-74d6-47e0-a048-e7d39e8c304f
+  Unmanage the instance with the provided ID under the AppOps account associated with the default DevHub control org.
   `
   ];
 
@@ -31,6 +37,8 @@ export default class Org extends SfdxCommand {
     list: flags.boolean({char: 'l', description: messages.getMessage('listFlagDescription')}),
     print: flags.boolean({char: 'p', description: messages.getMessage('printFlagDescription')}),
     manage: flags.boolean({char: 'm', description: messages.getMessage('manageFlagDescription')}),
+    unmanage: flags.boolean({char: 'x', description: messages.getMessage('unmanageFlagDescription')}),
+    instance: flags.string({char: 'i', description: messages.getMessage('instanceFlagDescription')}),
     version: flags.boolean({char: 's', description: messages.getMessage('versionFlagDescription')}),
     token: flags.string({char: 't', description: messages.getMessage('tokenFlagDescription')})
   };
@@ -48,12 +56,16 @@ export default class Org extends SfdxCommand {
     const listFlag = this.flags.list;
     const printFlag = this.flags.print;
     const manageFlag = this.flags.manage;
+    const unmanageFlag = this.flags.unmanage;
+    const instanceFlag = this.flags.instance;
     const versionFlag = this.flags.version;
     const vcsToken = this.flags.token;
 
     this.ux.log("List flag: " + listFlag);
     this.ux.log("Print flag: " + printFlag);
     this.ux.log("Manage flag: " + manageFlag);
+    this.ux.log("Instance flag: " + instanceFlag);
+    this.ux.log("Unmanage flag: " + unmanageFlag);
     this.ux.log("Version flag: " + versionFlag);
 
     if (listFlag === undefined && manageFlag === undefined) {
@@ -99,8 +111,10 @@ export default class Org extends SfdxCommand {
     } else if (manageFlag !== undefined) {
         this.ux.log(`Managing instance.`);
 
-        //this.ux.log("Refreshing org session auth");
-        //await this.org.refreshAuth();
+        this.ux.log("Refreshing org session auth");
+        try {
+            await this.org.refreshAuth();
+        } catch{  console.log("Target username not valid or not specified, refresh failed"); }
 
         this.ux.log("Creating connection.");
 
@@ -116,9 +130,70 @@ export default class Org extends SfdxCommand {
         this.ux.log("New managed instance: ", managedInstance.id);
 
         return managedInstance.id;
+    } else if (unmanageFlag !== undefined) {
+        this.ux.log(`Unmanaging instance.`);
+
+        let mangedInstanceId = null;
+
+        if (instanceFlag !== undefined) {
+            //Use provided managed instance
+            this.ux.log(`Managed instance ID provided, using instance with id ${instanceFlag}`);
+            mangedInstanceId = instanceFlag;
+        } else {
+            //Retrieve the managed instance associated with target org
+            //DevHub control org is never used as the default
+            var managedInstance = await this.getManagedInstance( this.org.getOrgId(), hubConn );
+            if( managedInstance === null ) {
+                throw new core.SfdxError(messages.getMessage('errorManagedInstaceNotFound')); 
+            }
+        }
+
+        await this.unmanageInstance(this.org.getOrgId(), connectionId, versionFlag, vcsToken, hubConn);
     }
     
   }
+
+  async getManagedInstance(orgId, hubConn) {
+    this.ux.log(`Retrieving the managed instance ID for org ${orgId}.`);
+
+    let path = '/services/apexrest/PDRI/v1/instances';
+    let managedInstance = null;
+
+    await hubConn.request(`${hubConn.instanceUrl}${path}`, function(err, res) {
+        if (err) { 
+            throw new core.SfdxError(err); 
+        }
+        console.log("Get managed instance response: ", JSON.stringify(res));
+        let managedInstances : ManagedInstances = JSON.parse( JSON.stringify(res) );
+        managedInstances.instances.forEach( (instance) => {
+            if( instance.platformInstanceId === orgId ) {
+                console.log("Found matching instance: ", instance);
+                managedInstance = instance;
+            }
+        });
+    });
+
+    return managedInstance;
+  }
+
+  async unmanageInstance(instanceId, hubConn) {
+    this.ux.log(`Unmanaging instance with ID ${instanceId}.`); 
+
+    let path = '/services/apexrest/PDRI/v1/instances/' + instanceId;
+    
+    let request = {
+        method : 'DELETE',
+        url : path
+    }
+
+    await hubConn.request(request, function(err, res) {
+        if (err) { 
+            throw new core.SfdxError(err); 
+        }
+    });
+
+    return;
+  }  
 
   async manageInstance(orgId, connectionId, versionFlag, vcsToken, hubConn) {
     this.ux.log(`Managing instance for org ID ${orgId}.`); 
