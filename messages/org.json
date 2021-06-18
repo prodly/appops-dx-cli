@@ -1,15 +1,30 @@
-{
-  "commandDescription": "Launches an AppOps relational data deployment for a scratch org.",
-  "sourceFlagDescription": "source connection name or record id",
-  "destinationFlagDescription": "destination connection name or record id",
-  "dataSetFlagDescription": "data set to deploy name or record id",
-  "deploymentPlanFlagDescription": "deployment plan to deploy name or record id",
-  "errorNoConnectionFound": "No active connections with the name or record ID '%s' found in the dev hub control org.",
-  "errorSourceAndTargetFlags": "Specify either the source or destination connection parameter, but not both.",
-  "errorDatasetAndPlanFlags": "Specify either the data set or deployment plan parameter, but not both.",
-  "errorNoDatasetAndPlanFlags": "Specify either the data set or deployment plan parameter.",
-  "errorNoDataSetFound": "No active data set with the name or record ID '%s' found in the dev hub control org.",
-  "errorNoDeploymentPlanFound": "No deployment plan with the name or record ID '%s' found in the dev hub control org.",
-  "errorNoControlOrgFound": "No active control org conneciton found in the dev hub control org.",
-  "errorInsertingDeploymentResult": "Failed to insert the deployment result: %s"
-}
+  {
+    "commandDescription": "Launches an AppOps relational data deployment.",
+    "nameFlagDescription": "name for the deployment",
+    "notesFlagDescription": "notes for the deployment",
+    "sourceFlagDescription": "source managed instance ID",
+    "destinationFlagDescription": "destination managed instance ID",
+    "dataSetFlagDescription": "name or record ID of the data set to deploy",
+    "deploymentPlanFlagDescription": "name or record ID of the deployment plan to deploy",
+
+    "listFlagDescription": "list all managed instances",
+    "printFlagDescription": "print the managed instances in a standard format in addition to returning structured data",
+    "manageFlagDescription": "manage a new instance",
+    "versionFlagDescription": "version the new managed instance, branch created and data deployed to the org",
+    "instanceFlagDescription": "managed instance ID on which to perform the action",
+    "tokenFlagDescription": "access token for VCS access",
+
+    "errorDatasetAndPlanFlags": "Specify either the data set or deployment plan parameter, but not both.",
+    "errorNoDatasetAndPlanFlags": "Specify either the data set or deployment plan parameter.",
+    "errorNoDataSetFound": "No active data set with the name or record ID '%s' found in the dev hub control org.",
+    "errorNoDeploymentPlanFound": "No deployment plan with the name or record ID '%s' found in the dev hub control org.",
+
+    "errorNoManageFlags": "No operation flag specified for the manage command",
+    "errorMultipleManageFlags": "Multiple operation flags specified for the manage command",
+    "errorPrintFlagNoListFlag": "Print flag only specified with the list operation flag",
+    "errorNoOrgWithManageFlags": "No org specified with the manage flag",
+    "errorVersionFlagNoManageFlag": "Version flag only specified with the manage operation flag",
+    "tokenFlagDescription": "Access token must be provided for versioning operations",
+    
+    "errorManagedInstaceNotFound": "Managed instance not found for the specified org id"
+  }
