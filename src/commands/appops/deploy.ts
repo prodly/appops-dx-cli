@@ -15,8 +15,8 @@ export default class Org extends SfdxCommand {
   public static description = messages.getMessage('commandDescription');
 
   public static examples = [
-  `$ sfdx appops:deploy -u FixesScratchOrg -v MainDevHub
-  Command output... deploying from the dev hub, the control org, to the scratch org.
+  `$ sfdx appops:deploy -n scratchorg -u FixesScratchOrg -v MainDevHub
+  Command output... deploying from the dev hub, the control org, to the scratch org, auto managed with provided name.
   Command output...
   `,
   `$ sfdx appops:deploy --targetusername test-utxac7gbati9@example.com --targetdevhubusername jsmith@acme.com 
@@ -34,12 +34,13 @@ export default class Org extends SfdxCommand {
 
   protected static flagsConfig = {
     // flag with a value (-d, --destination=VALUE)
-    name: flags.string({char: 'n', description: messages.getMessage('nameFlagDescription')}),
+    name: flags.string({char: 'n', description: messages.getMessage('deplomentNameFlagDescription')}),
     notes: flags.string({char: 'o', description: messages.getMessage('notesFlagDescription')}),
     source: flags.string({char: 's', description: messages.getMessage('sourceFlagDescription')}),
     destination: flags.string({char: 'd', description: messages.getMessage('destinationFlagDescription')}),
     dataset: flags.string({char: 't', description: messages.getMessage('dataSetFlagDescription')}),
-    plan: flags.string({char: 'p', description: messages.getMessage('deploymentPlanFlagDescription')})
+    plan: flags.string({char: 'p', description: messages.getMessage('deploymentPlanFlagDescription')}),
+    label: flags.string({char: 'b', description: messages.getMessage('instanceNameFlagDescription')})
   };
 
   // Comment this out if your command does not require an org username
@@ -62,6 +63,7 @@ export default class Org extends SfdxCommand {
     const destinationFlag = this.flags.destination;
     const datasetFlag = this.flags.dataset;
     const planFlag = this.flags.plan;
+    const labelFlag = this.flags.label;
     const isOrgSpecified = sourceFlag !== undefined || destinationFlag !== undefined;
 
     this.ux.log("Deployment name flag: " + deploymentNameFlag);
@@ -70,6 +72,7 @@ export default class Org extends SfdxCommand {
     this.ux.log("Destination instance flag: " + destinationFlag);
     this.ux.log("Data set flag: " + datasetFlag);
     this.ux.log("Deployment plan flag: " + planFlag);
+    this.ux.log("Instance name flag: " + labelFlag);
     //this.ux.log("Instances specified: " + isOrgSpecified);
 
     if (datasetFlag === undefined && planFlag === undefined) {
@@ -151,7 +154,7 @@ export default class Org extends SfdxCommand {
             if( !connectionId ) {
                 //If a connection doesn't exist, create it, then use it to manage the new instance
                 this.ux.log("Connection does not exist, creating.");
-                connectionId = await this.createConnection(this.org, hubConn);
+                connectionId = await this.createConnection(labelFlag, this.org, hubConn);
                 this.ux.log("Created connection with record ID: ", connectionId);
             } else {
                 //Update the connection with the latest access token
@@ -203,7 +206,7 @@ export default class Org extends SfdxCommand {
             if( !connectionId ) {
                 //If a connection doesn't exist, create it, then use it to manage the new instance
                 this.ux.log("Connection does not exist, creating.");
-                connectionId = await this.createConnection(this.org, hubConn);
+                connectionId = await this.createConnection(labelFlag, this.org, hubConn);
                 this.ux.log("Created connection with record ID: ", connectionId);
             } else {
                 //Update the connection with the latest access token
@@ -399,11 +402,11 @@ export default class Org extends SfdxCommand {
     });
   }*/
 
-  async createConnection(org, hubConn) {
+  async createConnection(name, org, hubConn) {
     const trailSlashRegex = /\/$/;
 
     let connection = { PDRI__Active__c : true, 
-        Name : 'Scratch Org ' + org.getOrgId(), 
+        Name : name ? name : org.getUsername() + ' ' + org.getOrgId(), 
         PDRI__OrganizationId__c : org.getOrgId(), 
         PDRI__Access_Token__c : org.getConnection().getConnectionOptions().accessToken,
         PDRI__Org_Type__c : 'Sandbox',
