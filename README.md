@@ -35,8 +35,8 @@ USAGE
 <!-- commands -->
 * [`appopsdxcli appops:checkin [-i <string>] [-t <string>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`](#appopsdxcli-appopscheckin--i-string--t-string--v-string--u-string---apiversion-string---json---loglevel-tracedebuginfowarnerrorfataltracedebuginfowarnerrorfatal)
 * [`appopsdxcli appops:checkout [-i <string>] [-t <string>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`](#appopsdxcli-appopscheckout--i-string--t-string--v-string--u-string---apiversion-string---json---loglevel-tracedebuginfowarnerrorfataltracedebuginfowarnerrorfatal)
-* [`appopsdxcli appops:deploy [-n <string>] [-o <string>] [-s <string>] [-d <string>] [-t <string>] [-p <string>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`](#appopsdxcli-appopsdeploy--n-string--o-string--s-string--d-string--t-string--p-string--v-string--u-string---apiversion-string---json---loglevel-tracedebuginfowarnerrorfataltracedebuginfowarnerrorfatal)
-* [`appopsdxcli appops:manage [-l] [-p] [-m] [-s] [-t <string>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`](#appopsdxcli-appopsmanage--l--p--m--s--t-string--v-string--u-string---apiversion-string---json---loglevel-tracedebuginfowarnerrorfataltracedebuginfowarnerrorfatal)
+* [`appopsdxcli appops:deploy [-n <string>] [-o <string>] [-s <string>] [-d <string>] [-t <string>] [-p <string>] [-b <string>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`](#appopsdxcli-appopsdeploy--n-string--o-string--s-string--d-string--t-string--p-string--b-string--v-string--u-string---apiversion-string---json---loglevel-tracedebuginfowarnerrorfataltracedebuginfowarnerrorfatal)
+* [`appopsdxcli appops:manage [-l] [-p] [-m] [-i <string>] [-b <string>] [-s] [-t <string>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`](#appopsdxcli-appopsmanage--l--p--m--i-string--b-string--s--t-string--v-string--u-string---apiversion-string---json---loglevel-tracedebuginfowarnerrorfataltracedebuginfowarnerrorfatal)
 
 ## `appopsdxcli appops:checkin [-i <string>] [-t <string>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`
 
@@ -51,8 +51,7 @@ OPTIONS
   -i, --instance=instance                                                           managed instance ID on which to
                                                                                     perform the action
 
-  -t, --token=token                                                                 Access token must be provided for
-                                                                                    versioning operations
+  -t, --token=token                                                                 access token for VCS access
 
   -u, --targetusername=targetusername                                               username or alias for the target
                                                                                     org; overrides default target org
@@ -97,8 +96,7 @@ OPTIONS
   -i, --instance=instance                                                           managed instance ID on which to
                                                                                     perform the action
 
-  -t, --token=token                                                                 Access token must be provided for
-                                                                                    versioning operations
+  -t, --token=token                                                                 access token for VCS access
 
   -u, --targetusername=targetusername                                               username or alias for the target
                                                                                     org; overrides default target org
@@ -130,17 +128,18 @@ EXAMPLES
 
 _See code: [src/commands/appops/checkout.ts](https://github.com/prodly/appopsdxcli/blob/v1.2.0/src/commands/appops/checkout.ts)_
 
-## `appopsdxcli appops:deploy [-n <string>] [-o <string>] [-s <string>] [-d <string>] [-t <string>] [-p <string>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`
+## `appopsdxcli appops:deploy [-n <string>] [-o <string>] [-s <string>] [-d <string>] [-t <string>] [-p <string>] [-b <string>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`
 
 Launches an AppOps relational data deployment.
 
 ```
 USAGE
-  $ appopsdxcli appops:deploy [-n <string>] [-o <string>] [-s <string>] [-d <string>] [-t <string>] [-p <string>] [-v 
-  <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel 
+  $ appopsdxcli appops:deploy [-n <string>] [-o <string>] [-s <string>] [-d <string>] [-t <string>] [-p <string>] [-b 
+  <string>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel 
   trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]
 
 OPTIONS
+  -b, --label=label                                                                 connection and managed instance name
   -d, --destination=destination                                                     destination managed instance ID
   -n, --name=name                                                                   name for the deployment
   -o, --notes=notes                                                                 notes for the deployment
@@ -168,8 +167,8 @@ OPTIONS
                                                                                     this command invocation
 
 EXAMPLES
-  $ sfdx appops:deploy -u FixesScratchOrg -v MainDevHub
-     Command output... deploying from the dev hub, the control org, to the scratch org.
+  $ sfdx appops:deploy -n scratchorg -u FixesScratchOrg -v MainDevHub
+     Command output... deploying from the dev hub, the control org, to the scratch org, auto managed with provided name.
      Command output...
   
   $ sfdx appops:deploy --targetusername test-utxac7gbati9@example.com --targetdevhubusername jsmith@acme.com 
@@ -187,17 +186,23 @@ EXAMPLES
 
 _See code: [src/commands/appops/deploy.ts](https://github.com/prodly/appopsdxcli/blob/v1.2.0/src/commands/appops/deploy.ts)_
 
-## `appopsdxcli appops:manage [-l] [-p] [-m] [-s] [-t <string>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`
+## `appopsdxcli appops:manage [-l] [-p] [-m] [-i <string>] [-b <string>] [-s] [-t <string>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`
 
 Launches an AppOps relational data deployment.
 
 ```
 USAGE
-  $ appopsdxcli appops:manage [-l] [-p] [-m] [-s] [-t <string>] [-v <string>] [-u <string>] [--apiversion <string>] 
-  [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]
+  $ appopsdxcli appops:manage [-l] [-p] [-m] [-i <string>] [-b <string>] [-s] [-t <string>] [-v <string>] [-u <string>] 
+  [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]
 
 OPTIONS
+  -b, --label=label                                                                 connection and managed instance name
+
+  -i, --instance=instance                                                           managed instance ID on which to
+                                                                                    perform the action
+
   -l, --list                                                                        list all managed instances
+
   -m, --manage                                                                      manage a new instance
 
   -p, --print                                                                       print the managed instances in a
@@ -208,8 +213,7 @@ OPTIONS
                                                                                     branch created and data deployed to
                                                                                     the org
 
-  -t, --token=token                                                                 Access token must be provided for
-                                                                                    versioning operations
+  -t, --token=token                                                                 access token for VCS access
 
   -u, --targetusername=targetusername                                               username or alias for the target
                                                                                     org; overrides default target org
@@ -233,7 +237,7 @@ EXAMPLES
      Manage the org associated with the target username under the AppOps account associated with the provided DevHub 
   control org.
   
-  $ sfdx appops:manage -m -u test-utxac7gbati9@example.com
+  $ sfdx appops:manage -m -u test-utxac7gbati9@example.com -n dev7sbx
      Manage and version the org associated with the target username under the AppOps account associated with the default 
   DevHub control org.
 ```

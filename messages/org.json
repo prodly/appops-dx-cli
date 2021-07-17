@@ -1,6 +1,6 @@
   {
     "commandDescription": "Launches an AppOps relational data deployment.",
-    "nameFlagDescription": "name for the deployment",
+    "deplomentNameFlagDescription": "name for the deployment",
     "notesFlagDescription": "notes for the deployment",
     "sourceFlagDescription": "source managed instance ID",
     "destinationFlagDescription": "destination managed instance ID",
@@ -13,6 +13,7 @@
     "unmanageFlagDescription": "unmanage the specified instance",
     "versionFlagDescription": "version the new managed instance, branch created and data deployed to the org",
     "instanceFlagDescription": "managed instance ID on which to perform the action",
+    "instanceNameFlagDescription": "connection and managed instance name",
     "tokenFlagDescription": "access token for VCS access",
 
     "errorDatasetAndPlanFlags": "Specify either the data set or deployment plan parameter, but not both.",
