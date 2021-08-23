@@ -32,7 +32,7 @@ export default class Org extends SfdxCommand {
   protected static flagsConfig = {
     // flag with a value (-d, --destination=VALUE)
     instance: flags.string({char: 'i', description: messages.getMessage('instanceFlagDescription')}),
-    token: flags.string({char: 't', description: messages.getMessage('tokenFlagDescription')})
+    deactivate: flags.boolean({char: 'e', description: messages.getMessage('deactivateFlagDescription')})
   };
 
   // Comment this out if your command does not require an org username
@@ -46,9 +46,10 @@ export default class Org extends SfdxCommand {
 
   public async run(): Promise<AnyJson> {
     const instanceFlag = this.flags.instance;
-    const vcsToken = this.flags.token;
+    const deactivateFlag = this.flags.deactivate;
 
     this.ux.log("Instance flag: " + instanceFlag);
+    this.ux.log("Deactivate flag: " + deactivateFlag);
 
     // this.org is guaranteed because requiresUsername=true, as opposed to supportsUsername
     const hubConn = this.hubOrg.getConnection();
@@ -81,20 +82,31 @@ export default class Org extends SfdxCommand {
     }
 
     //Perform the checkin
-    await this.checkoutInstance(mangedInstanceId, vcsToken, hubConn);
+    await this.checkoutInstance(mangedInstanceId, deactivateFlag, hubConn);
 
     return '{}';
   }
 
-  async checkoutInstance(mangedInstanceId, vcsToken, hubConn) {
+  async checkoutInstance(mangedInstanceId, deactivateAllEvents, hubConn) {
     this.ux.log(`Performing checkout for managed instance with id ${mangedInstanceId}.`);
 
     let path = '/services/apexrest/PDRI/v1/instances/' + mangedInstanceId + '/checkout';
 
+    let eventControlOptions = {
+        deactivateAllEvents : true
+    };
+
+    let checkoutInstance = {
+        eventControlOptions : eventControlOptions
+    };
+
+    console.log("Sending checkout request body: ");
+    console.log(JSON.stringify(checkoutInstance));
+
     let request = {
-        body : '',
+        body : JSON.stringify(checkoutInstance),
         method : 'POST',
-        headers : { 'vcs-access-token': vcsToken },
+        //headers : { 'vcs-access-token': vcsToken },
         url : path
     }
 

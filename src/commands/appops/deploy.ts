@@ -40,7 +40,10 @@ export default class Org extends SfdxCommand {
     destination: flags.string({char: 'd', description: messages.getMessage('destinationFlagDescription')}),
     dataset: flags.string({char: 't', description: messages.getMessage('dataSetFlagDescription')}),
     plan: flags.string({char: 'p', description: messages.getMessage('deploymentPlanFlagDescription')}),
-    label: flags.string({char: 'b', description: messages.getMessage('instanceNameFlagDescription')})
+    label: flags.string({char: 'b', description: messages.getMessage('instanceNameFlagDescription')}),
+    deactivate: flags.boolean({char: 'e', description: messages.getMessage('deactivateFlagDescription')}),
+    simulation: flags.boolean({char: 'l', description: messages.getMessage('simulationFlagDescription')}),
+    filter: flags.string({char: 'q', description: messages.getMessage('queryFilterFlagDescription')})
   };
 
   // Comment this out if your command does not require an org username
@@ -56,15 +59,15 @@ export default class Org extends SfdxCommand {
   public async run(): Promise<AnyJson> {
     const deploymentNameFlag = this.flags.name;
     const deploymentNotesFlag = this.flags.notes;
-    const simulationFlag = false; //this.flags.simulation;
-    const deactivateAllEventsFlag = false; //this.flags.deactivateAllEvents;
-    const queryFilterFlag = undefined; //this.flags.queryFilter;
     const sourceFlag = this.flags.source;
     const destinationFlag = this.flags.destination;
     const datasetFlag = this.flags.dataset;
     const planFlag = this.flags.plan;
     const labelFlag = this.flags.label;
     const isOrgSpecified = sourceFlag !== undefined || destinationFlag !== undefined;
+    const deactivateFlag = this.flags.deactivate;
+    const simulationFlag = this.flags.simulation;
+    const queryFilterFlag = this.flags.filter;
 
     this.ux.log("Deployment name flag: " + deploymentNameFlag);
     this.ux.log("Deployment description flag: " + deploymentNotesFlag);
@@ -74,6 +77,9 @@ export default class Org extends SfdxCommand {
     this.ux.log("Deployment plan flag: " + planFlag);
     this.ux.log("Instance name flag: " + labelFlag);
     //this.ux.log("Instances specified: " + isOrgSpecified);
+    this.ux.log("Deactivate flag: " + deactivateFlag);
+    this.ux.log("Simulation flag: " + simulationFlag);
+    this.ux.log("Query filter flag: " + queryFilterFlag);
 
     if (datasetFlag === undefined && planFlag === undefined) {
         throw new core.SfdxError(messages.getMessage('errorNoDatasetAndPlanFlags', []));
@@ -237,7 +243,7 @@ export default class Org extends SfdxCommand {
     let jobId = await this.deploy(deploymentNameFlag,
         deploymentNotesFlag,
         simulationFlag,
-        deactivateAllEventsFlag,
+        deactivateFlag,
         queryFilterFlag,
         sourceInstanceId, 
         destinationInstanceId,
@@ -266,17 +272,21 @@ export default class Org extends SfdxCommand {
     this.ux.log(`Invoking deployment.`);
 
     let path = '/services/apexrest/PDRI/v1/instances/' + destinationInstanceId + '/deploy';
+    
+    let eventControlOptions = {
+        deactivateAll : deactivateAllEvents === undefined ? false : true
+    }
 
-    let dataSetIdWrapper = {
-        label : "",
-        id : dataSetId,
-        disabled: false
+    let queryFilterOptions = {
+        filter : queryFilter === undefined ? undefined : queryFilter
     }
 
     let dataDeploymentOptions = {
-        dataSetId : dataSetIdWrapper
-        //dataSetId : dataSetId,
-        //deploymentPlanId : deploymentPlanId
+        dataSetId : dataSetId,
+        deploymentPlanId : deploymentPlanId,
+        simulation : simulation === undefined ? false : simulation,
+        eventControlOptions : eventControlOptions,
+        queryFilter : queryFilterOptions
     }
     
     let sourceOptions = {
@@ -287,9 +297,11 @@ export default class Org extends SfdxCommand {
         deploymentName : deploymentName,
         deploymentNotes : deploymentNotes,
         data : [dataDeploymentOptions],
+        metadata : {},
         source : sourceOptions
     };
 
+    console.log("Sending deploy request path: " + path);
     console.log("Sending deploy request body: ");
     console.log(JSON.stringify(deployInstance));
 

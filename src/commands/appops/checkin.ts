@@ -32,7 +32,7 @@ export default class Org extends SfdxCommand {
   protected static flagsConfig = {
     // flag with a value (-d, --destination=VALUE)
     instance: flags.string({char: 'i', description: messages.getMessage('instanceFlagDescription')}),
-    token: flags.string({char: 't', description: messages.getMessage('tokenFlagDescription')})
+    comment: flags.string({char: 'c', description: messages.getMessage('commentFlagDescription')})
   };
 
   // Comment this out if your command does not require an org username
@@ -46,9 +46,10 @@ export default class Org extends SfdxCommand {
 
   public async run(): Promise<AnyJson> {
     const instanceFlag = this.flags.instance;
-    const vcsToken = this.flags.token;
+    const commentFlag = this.flags.comment;
 
     this.ux.log("Instance flag: " + instanceFlag);
+    this.ux.log("Comment flag: " + commentFlag);
 
     // this.org is guaranteed because requiresUsername=true, as opposed to supportsUsername
     const hubConn = this.hubOrg.getConnection();
@@ -81,7 +82,7 @@ export default class Org extends SfdxCommand {
     }
 
     //Perform the checkin
-    await this.checkinInstance(mangedInstanceId, vcsToken, hubConn);
+    await this.checkinInstance(mangedInstanceId, commentFlag, hubConn);
 
     return '{}';
   }
@@ -98,15 +99,22 @@ export default class Org extends SfdxCommand {
     });
   }  
 
-  async checkinInstance(mangedInstanceId, vcsToken, hubConn) {
+  async checkinInstance(mangedInstanceId, comment, hubConn) {
     this.ux.log(`Performing checkin for managed instance with id ${mangedInstanceId}.`);
 
     let path = '/services/apexrest/PDRI/v1/instances/' + mangedInstanceId + '/checkin';
 
+    let checkinInstance = {
+        commitMessage : comment
+    };
+
+    console.log("Sending checkin request body: ");
+    console.log(JSON.stringify(checkinInstance));
+
     let request = {
-        body : '',
+        body : JSON.stringify(checkinInstance),
         method : 'POST',
-        headers : { 'vcs-access-token': vcsToken },
+        //headers : { 'vcs-access-token': vcsToken },
         url : path
     }
 
