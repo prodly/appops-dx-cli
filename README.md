@@ -25,7 +25,7 @@ $ npm install -g appopsdxcli
 $ appopsdxcli COMMAND
 running command...
 $ appopsdxcli (-v|--version|version)
-appopsdxcli/1.2.0 darwin-x64 node-v14.15.5
+appopsdxcli/1.4.0 darwin-x64 node-v14.15.5
 $ appopsdxcli --help [COMMAND]
 USAGE
   $ appopsdxcli COMMAND
@@ -33,25 +33,26 @@ USAGE
 ```
 <!-- usagestop -->
 <!-- commands -->
-* [`appopsdxcli appops:checkin [-i <string>] [-t <string>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`](#appopsdxcli-appopscheckin--i-string--t-string--v-string--u-string---apiversion-string---json---loglevel-tracedebuginfowarnerrorfataltracedebuginfowarnerrorfatal)
-* [`appopsdxcli appops:checkout [-i <string>] [-t <string>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`](#appopsdxcli-appopscheckout--i-string--t-string--v-string--u-string---apiversion-string---json---loglevel-tracedebuginfowarnerrorfataltracedebuginfowarnerrorfatal)
-* [`appopsdxcli appops:deploy [-n <string>] [-o <string>] [-s <string>] [-d <string>] [-t <string>] [-p <string>] [-b <string>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`](#appopsdxcli-appopsdeploy--n-string--o-string--s-string--d-string--t-string--p-string--b-string--v-string--u-string---apiversion-string---json---loglevel-tracedebuginfowarnerrorfataltracedebuginfowarnerrorfatal)
-* [`appopsdxcli appops:manage [-l] [-p] [-m] [-i <string>] [-b <string>] [-s] [-t <string>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`](#appopsdxcli-appopsmanage--l--p--m--i-string--b-string--s--t-string--v-string--u-string---apiversion-string---json---loglevel-tracedebuginfowarnerrorfataltracedebuginfowarnerrorfatal)
+* [`appopsdxcli appops:checkin [-i <string>] [-c <string>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`](#appopsdxcli-appopscheckin--i-string--c-string--v-string--u-string---apiversion-string---json---loglevel-tracedebuginfowarnerrorfataltracedebuginfowarnerrorfatal)
+* [`appopsdxcli appops:checkout [-i <string>] [-e] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`](#appopsdxcli-appopscheckout--i-string--e--v-string--u-string---apiversion-string---json---loglevel-tracedebuginfowarnerrorfataltracedebuginfowarnerrorfatal)
+* [`appopsdxcli appops:deploy [-n <string>] [-o <string>] [-s <string>] [-d <string>] [-t <string>] [-p <string>] [-b <string>] [-e] [-l] [-q <string>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`](#appopsdxcli-appopsdeploy--n-string--o-string--s-string--d-string--t-string--p-string--b-string--e--l--q-string--v-string--u-string---apiversion-string---json---loglevel-tracedebuginfowarnerrorfataltracedebuginfowarnerrorfatal)
+* [`appopsdxcli appops:manage [-l] [-p] [-m] [-x] [-i <string>] [-b <string>] [-s] [-c <string>] [-n <string>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`](#appopsdxcli-appopsmanage--l--p--m--x--i-string--b-string--s--c-string--n-string--v-string--u-string---apiversion-string---json---loglevel-tracedebuginfowarnerrorfataltracedebuginfowarnerrorfatal)
 
-## `appopsdxcli appops:checkin [-i <string>] [-t <string>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`
+## `appopsdxcli appops:checkin [-i <string>] [-c <string>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`
 
 Launches an AppOps relational data deployment.
 
 ```
 USAGE
-  $ appopsdxcli appops:checkin [-i <string>] [-t <string>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] 
+  $ appopsdxcli appops:checkin [-i <string>] [-c <string>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] 
   [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]
 
 OPTIONS
+  -c, --comment=comment                                                             comment for the command versioning
+                                                                                    commit
+
   -i, --instance=instance                                                           managed instance ID on which to
                                                                                     perform the action
-
-  -t, --token=token                                                                 access token for VCS access
 
   -u, --targetusername=targetusername                                               username or alias for the target
                                                                                     org; overrides default target org
@@ -81,22 +82,23 @@ EXAMPLES
      The instance should be managed by the AppOps account associated with the default DevHub control org.
 ```
 
-_See code: [src/commands/appops/checkin.ts](https://github.com/prodly/appopsdxcli/blob/v1.2.0/src/commands/appops/checkin.ts)_
+_See code: [src/commands/appops/checkin.ts](https://github.com/prodly/appopsdxcli/blob/v1.4.0/src/commands/appops/checkin.ts)_
 
-## `appopsdxcli appops:checkout [-i <string>] [-t <string>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`
+## `appopsdxcli appops:checkout [-i <string>] [-e] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`
 
 Launches an AppOps relational data deployment.
 
 ```
 USAGE
-  $ appopsdxcli appops:checkout [-i <string>] [-t <string>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] 
+  $ appopsdxcli appops:checkout [-i <string>] [-e] [-v <string>] [-u <string>] [--apiversion <string>] [--json] 
   [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]
 
 OPTIONS
+  -e, --deactivate                                                                  deactivate all events for the
+                                                                                    deployment
+
   -i, --instance=instance                                                           managed instance ID on which to
                                                                                     perform the action
-
-  -t, --token=token                                                                 access token for VCS access
 
   -u, --targetusername=targetusername                                               username or alias for the target
                                                                                     org; overrides default target org
@@ -126,26 +128,36 @@ EXAMPLES
        The instance should be managed by the AppOps account associated with the default DevHub control org.
 ```
 
-_See code: [src/commands/appops/checkout.ts](https://github.com/prodly/appopsdxcli/blob/v1.2.0/src/commands/appops/checkout.ts)_
+_See code: [src/commands/appops/checkout.ts](https://github.com/prodly/appopsdxcli/blob/v1.4.0/src/commands/appops/checkout.ts)_
 
-## `appopsdxcli appops:deploy [-n <string>] [-o <string>] [-s <string>] [-d <string>] [-t <string>] [-p <string>] [-b <string>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`
+## `appopsdxcli appops:deploy [-n <string>] [-o <string>] [-s <string>] [-d <string>] [-t <string>] [-p <string>] [-b <string>] [-e] [-l] [-q <string>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`
 
 Launches an AppOps relational data deployment.
 
 ```
 USAGE
   $ appopsdxcli appops:deploy [-n <string>] [-o <string>] [-s <string>] [-d <string>] [-t <string>] [-p <string>] [-b 
-  <string>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel 
+  <string>] [-e] [-l] [-q <string>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel 
   trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]
 
 OPTIONS
   -b, --label=label                                                                 connection and managed instance name
   -d, --destination=destination                                                     destination managed instance ID
+
+  -e, --deactivate                                                                  deactivate all events for the
+                                                                                    deployment
+
+  -l, --simulation                                                                  perform a data simulation
+
   -n, --name=name                                                                   name for the deployment
+
   -o, --notes=notes                                                                 notes for the deployment
 
   -p, --plan=plan                                                                   name or record ID of the deployment
                                                                                     plan to deploy
+
+  -q, --filter=filter                                                               query filter override for a data set
+                                                                                    deployment
 
   -s, --source=source                                                               source managed instance ID
 
@@ -184,19 +196,23 @@ EXAMPLES
   hub, control org. Long param names.
 ```
 
-_See code: [src/commands/appops/deploy.ts](https://github.com/prodly/appopsdxcli/blob/v1.2.0/src/commands/appops/deploy.ts)_
+_See code: [src/commands/appops/deploy.ts](https://github.com/prodly/appopsdxcli/blob/v1.4.0/src/commands/appops/deploy.ts)_
 
-## `appopsdxcli appops:manage [-l] [-p] [-m] [-i <string>] [-b <string>] [-s] [-t <string>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`
+## `appopsdxcli appops:manage [-l] [-p] [-m] [-x] [-i <string>] [-b <string>] [-s] [-c <string>] [-n <string>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`
 
 Launches an AppOps relational data deployment.
 
 ```
 USAGE
-  $ appopsdxcli appops:manage [-l] [-p] [-m] [-i <string>] [-b <string>] [-s] [-t <string>] [-v <string>] [-u <string>] 
-  [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]
+  $ appopsdxcli appops:manage [-l] [-p] [-m] [-x] [-i <string>] [-b <string>] [-s] [-c <string>] [-n <string>] [-v 
+  <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel 
+  trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]
 
 OPTIONS
   -b, --label=label                                                                 connection and managed instance name
+
+  -c, --comment=comment                                                             comment for the command versioning
+                                                                                    commit
 
   -i, --instance=instance                                                           managed instance ID on which to
                                                                                     perform the action
@@ -204,6 +220,9 @@ OPTIONS
   -l, --list                                                                        list all managed instances
 
   -m, --manage                                                                      manage a new instance
+
+  -n, --connection=connection                                                       connection to use for the managed
+                                                                                    instance
 
   -p, --print                                                                       print the managed instances in a
                                                                                     standard format in addition to
@@ -213,13 +232,13 @@ OPTIONS
                                                                                     branch created and data deployed to
                                                                                     the org
 
-  -t, --token=token                                                                 access token for VCS access
-
   -u, --targetusername=targetusername                                               username or alias for the target
                                                                                     org; overrides default target org
 
   -v, --targetdevhubusername=targetdevhubusername                                   username or alias for the dev hub
                                                                                     org; overrides default dev hub org
+
+  -x, --unmanage                                                                    unmanage the specified instance
 
   --apiversion=apiversion                                                           override the api version used for
                                                                                     api requests made by this command
@@ -242,7 +261,7 @@ EXAMPLES
   DevHub control org.
 ```
 
-_See code: [src/commands/appops/manage.ts](https://github.com/prodly/appopsdxcli/blob/v1.2.0/src/commands/appops/manage.ts)_
+_See code: [src/commands/appops/manage.ts](https://github.com/prodly/appopsdxcli/blob/v1.4.0/src/commands/appops/manage.ts)_
 <!-- commandsstop -->
 <!-- debugging-your-plugin -->
 # Debugging your plugin

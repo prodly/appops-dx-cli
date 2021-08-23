@@ -14,7 +14,11 @@
     "versionFlagDescription": "version the new managed instance, branch created and data deployed to the org",
     "instanceFlagDescription": "managed instance ID on which to perform the action",
     "instanceNameFlagDescription": "connection and managed instance name",
-    "tokenFlagDescription": "access token for VCS access",
+    "deactivateFlagDescription": "deactivate all events for the deployment",
+    "commentFlagDescription": "comment for the command versioning commit",
+    "simulationFlagDescription": "perform a data simulation",
+    "queryFilterFlagDescription": "query filter override for a data set deployment",
+    "connectionFlagDescription": "connection to use for the managed instance",
 
     "errorDatasetAndPlanFlags": "Specify either the data set or deployment plan parameter, but not both.",
     "errorNoDatasetAndPlanFlags": "Specify either the data set or deployment plan parameter.",

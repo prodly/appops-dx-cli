@@ -37,11 +37,12 @@ export default class Org extends SfdxCommand {
     list: flags.boolean({char: 'l', description: messages.getMessage('listFlagDescription')}),
     print: flags.boolean({char: 'p', description: messages.getMessage('printFlagDescription')}),
     manage: flags.boolean({char: 'm', description: messages.getMessage('manageFlagDescription')}),
-    //unmanage: flags.boolean({char: 'x', description: messages.getMessage('unmanageFlagDescription')}),
+    unmanage: flags.boolean({char: 'x', description: messages.getMessage('unmanageFlagDescription')}),
     instance: flags.string({char: 'i', description: messages.getMessage('instanceFlagDescription')}),
     label: flags.string({char: 'b', description: messages.getMessage('instanceNameFlagDescription')}),
     version: flags.boolean({char: 's', description: messages.getMessage('versionFlagDescription')}),
-    token: flags.string({char: 't', description: messages.getMessage('tokenFlagDescription')})
+    comment: flags.string({char: 'c', description: messages.getMessage('commentFlagDescription')}),
+    connection: flags.string({char: 'n', description: messages.getMessage('connectionFlagDescription')})
   };
 
   // Comment this out if your command does not require an org username
@@ -57,21 +58,24 @@ export default class Org extends SfdxCommand {
     const listFlag = this.flags.list;
     const printFlag = this.flags.print;
     const manageFlag = this.flags.manage;
-    //const unmanageFlag = this.flags.unmanage;
+    const unmanageFlag = this.flags.unmanage;
     const instanceFlag = this.flags.instance;
     const labelFlag = this.flags.label;
     const versionFlag = this.flags.version;
-    const vcsToken = this.flags.token;
+    const commentFlag = this.flags.comment;
+    const connectionFlag = this.flags.connection;
 
     this.ux.log("List flag: " + listFlag);
     this.ux.log("Print flag: " + printFlag);
     this.ux.log("Manage flag: " + manageFlag);
     this.ux.log("Instance flag: " + instanceFlag);
     this.ux.log("Instance name flag: " + labelFlag);
-    //this.ux.log("Unmanage flag: " + unmanageFlag);
+    this.ux.log("Unmanage flag: " + unmanageFlag);
     this.ux.log("Version flag: " + versionFlag);
+    this.ux.log("Comment flag: " + commentFlag);
+    this.ux.log("Connection flag: " + connectionFlag);
 
-    if (listFlag === undefined && manageFlag === undefined) {
+    if (listFlag === undefined && manageFlag === undefined && unmanageFlag === undefined) {
         throw new core.SfdxError(messages.getMessage('errorNoManageFlags', []));
     }
 
@@ -89,6 +93,8 @@ export default class Org extends SfdxCommand {
 
     // this.org is guaranteed because requiresUsername=true, as opposed to supportsUsername
     const hubConn = this.hubOrg.getConnection();
+    const orgIdRegxp = /^([a-zA-Z0-9_-]){15,18}$/;
+
 
     //List manages instances command
     if (listFlag !== undefined) {
@@ -119,12 +125,19 @@ export default class Org extends SfdxCommand {
             await this.org.refreshAuth();
         } catch{  console.log("Target username not valid or not specified, refresh failed"); }
 
-        this.ux.log("Creating connection.");
+        let connectionId = null;
 
-        let connectionId = await this.createConnection(labelFlag, this.org, hubConn);
-        this.ux.log("Created connection with record ID: ", connectionId);
+        if( connectionFlag ) {
+            this.ux.log("Connection to use for the managed instances provided: " + connectionFlag);
+            connectionId = await this.queryConnection(connectionFlag, orgIdRegxp, hubConn);
+        } else {
+            this.ux.log("Creating connection.");
 
-        let managedInstance = await this.manageInstance(this.org.getOrgId(), connectionId, versionFlag, vcsToken, hubConn);
+            connectionId = await this.createConnection(labelFlag, this.org, hubConn);
+            this.ux.log("Created connection with record ID: ", connectionId);
+        }
+
+        let managedInstance = await this.manageInstance(this.org.getOrgId(), connectionId, versionFlag, commentFlag, hubConn);
 
         if( managedInstance === null ) {
             throw new core.SfdxError(messages.getMessage('errorManagedInstaceNotFound')); 
@@ -133,7 +146,7 @@ export default class Org extends SfdxCommand {
         this.ux.log("New managed instance: ", managedInstance.id);
 
         return managedInstance.id;
-    } /*else if (unmanageFlag !== undefined) {
+    } else if (unmanageFlag !== undefined) {
         this.ux.log(`Unmanaging instance.`);
 
         let mangedInstanceId = null;
@@ -153,8 +166,31 @@ export default class Org extends SfdxCommand {
         }
 
         await this.unmanageInstance(mangedInstanceId, hubConn);
-    }*/
+    }
     
+  }
+
+  async queryConnection(connectionNameOrId, orgIdRegxp, hubConn) {
+    this.ux.log("Querying connection: " + connectionNameOrId);
+
+    var query = `Select Id, Name, PDRI__Instance_URL__c, PDRI__Org_Type__c, PDRI__OrganizationId__c, PDRI__User_Id__c, PDRI__Refresh_Token__c, PDRI__Access_Token__c from PDRI__Connection__c where PDRI__Active__c = true AND `;
+
+    const isId = orgIdRegxp.test(connectionNameOrId);
+    var orgQuery;
+    if (isId) {
+        orgQuery = query + `Id = '` + connectionNameOrId + `' order by lastmodifieddate desc limit 1`;
+    } else {
+        orgQuery = query + `Name = '` + connectionNameOrId + `' order by lastmodifieddate desc limit 1`;
+    }
+    this.ux.log("Running source query: " + orgQuery);
+    // Query the org
+    const result = await hubConn.query(orgQuery);
+    // The output and --json will automatically be handled for you.
+    if (!result.records || result.records.length <= 0) {
+        throw new core.SfdxError(messages.getMessage('errorNoConnectionFound', [connectionNameOrId]));
+    }
+
+    return result.records[0].Id;
   }
 
   async getManagedInstance(orgId, hubConn) {
@@ -180,7 +216,7 @@ export default class Org extends SfdxCommand {
     return managedInstance;
   }
 
-  /*async unmanageInstance(instanceId, hubConn) {
+  async unmanageInstance(instanceId, hubConn) {
     this.ux.log(`Unmanaging instance with ID ${instanceId}.`); 
 
     let path = '/services/apexrest/PDRI/v1/instances/' + instanceId;
@@ -197,9 +233,9 @@ export default class Org extends SfdxCommand {
     });
 
     return;
-  }*/
+  }
 
-  async manageInstance(orgId, connectionId, versionFlag, vcsToken, hubConn) {
+  async manageInstance(orgId, connectionId, versionFlag, comment, hubConn) {
     this.ux.log(`Managing instance for org ID ${orgId}.`); 
 
     let jobId = null;
@@ -209,7 +245,11 @@ export default class Org extends SfdxCommand {
 
     if( versionFlag ) {
         this.ux.log(`Versioning is enabled.`);
-        versioningBody = ', "options": {"checkin": true, "checkout": true}'
+        versioningBody = ', "options": {"checkin": true, "checkout": true, "commitMessage": "' + comment + '"}';
+
+        if( comment ) {
+            versioningBody += ', "commitMessage": "' + comment + '"';
+        }
     }
 
     let body = '{' + platformInstanceBody + versioningBody + '}';
@@ -217,7 +257,7 @@ export default class Org extends SfdxCommand {
     let request = {
         body : body,
         method : 'POST',
-        headers : { 'vcs-access-token': vcsToken },
+        //headers : { 'vcs-access-token': vcsToken },
         url : path
     }
 
