@@ -129,7 +129,8 @@ export default class Org extends SfdxCommand {
 
         if( connectionFlag ) {
             this.ux.log("Connection to use for the managed instances provided: " + connectionFlag);
-            connectionId = await this.queryConnection(connectionFlag, orgIdRegxp, hubConn);
+            let connection = await this.queryConnection(connectionFlag, orgIdRegxp, hubConn);
+            connectionId = connection.Id;
         } else {
             this.ux.log("Creating connection.");
 
@@ -155,14 +156,20 @@ export default class Org extends SfdxCommand {
             //Use provided managed instance
             this.ux.log(`Managed instance ID provided, using instance with id ${instanceFlag}`);
             mangedInstanceId = instanceFlag;
-        } else {
+        } else if( connectionFlag ) {
+            this.ux.log("Connection to use for the managed instances provided: " + connectionFlag);
+            let connection = await this.queryConnection(connectionFlag, orgIdRegxp, hubConn);
+            let orgId = connection.PDRI__OrganizationId__c;
+
             //Retrieve the managed instance associated with target org
             //DevHub control org is never used as the default
-            var managedInstance = await this.getManagedInstance( this.org.getOrgId(), hubConn );
+            var managedInstance = await this.getManagedInstance( orgId, hubConn );
             if( managedInstance === null ) {
                 throw new core.SfdxError(messages.getMessage('errorManagedInstaceNotFound')); 
             }
             mangedInstanceId = managedInstance.id;
+        } else {
+            throw new core.SfdxError(messages.getMessage('errorManagedInstaceNotProvided')); 
         }
 
         await this.unmanageInstance(mangedInstanceId, hubConn);
@@ -173,7 +180,7 @@ export default class Org extends SfdxCommand {
   async queryConnection(connectionNameOrId, orgIdRegxp, hubConn) {
     this.ux.log("Querying connection: " + connectionNameOrId);
 
-    var query = `Select Id, Name, PDRI__Instance_URL__c, PDRI__Org_Type__c, PDRI__OrganizationId__c, PDRI__User_Id__c, PDRI__Refresh_Token__c, PDRI__Access_Token__c from PDRI__Connection__c where PDRI__Active__c = true AND `;
+    var query = `Select Id, Name, PDRI__OrganizationId__c from PDRI__Connection__c where PDRI__Active__c = true AND `;
 
     const isId = orgIdRegxp.test(connectionNameOrId);
     var orgQuery;
@@ -190,7 +197,7 @@ export default class Org extends SfdxCommand {
         throw new core.SfdxError(messages.getMessage('errorNoConnectionFound', [connectionNameOrId]));
     }
 
-    return result.records[0].Id;
+    return result.records[0];
   }
 
   async getManagedInstance(orgId, hubConn) {
