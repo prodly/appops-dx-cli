@@ -290,14 +290,14 @@ export default class Org extends SfdxCommand {
 
     //Currently wait for no jobs to be returned, which mean the job completed, but bad way of doing this.
     let completedJob = null;
-    for (let i = 0; i < 60; i++) {
+    for (let i = 0; i < 1800; i++) {
         let job = await this.jobCompletion(jobId, hubConn);
         if( job ) {
             this.ux.log(`Job completed.`);
             completedJob = job;
             break;
         }
-        await this.delay(500);
+        await this.delay(1000);
     }
 
     if( !completedJob ) {
