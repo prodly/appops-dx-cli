@@ -331,11 +331,14 @@ export default class Org extends SfdxCommand {
     const isId = orgIdRegxp.test(dataEntityFlag);
     this.ux.log("Is org ID: " + isId);
     let queryData;
-    if (isId) {
+    if (isId && dataEntityType === 'PDRI__DataSet__c') {
         queryData = "Select Id, Name from " + dataEntityType + " where PDRI__Active__c = true AND Id = '" + dataEntityFlag + "' order by lastmodifieddate desc limit 1";
-    }
-    else {
+    } else if (isId && dataEntityType === 'PDRI__Deployment_Plan__c') {
+        queryData = "Select Id, Name from " + dataEntityType + " where Id = '" + dataEntityFlag + "' order by lastmodifieddate desc limit 1";
+    } else if( !isId && dataEntityType === 'PDRI__DataSet__c' ) {
         queryData = "Select Id, Name from " + dataEntityType + " where PDRI__Active__c = true AND Name = '" + dataEntityFlag + "' order by lastmodifieddate desc limit 1";
+    } else if( !isId && dataEntityType === 'PDRI__Deployment_Plan__c' ) {
+        queryData = "Select Id, Name from " + dataEntityType + " where Name = '" + dataEntityFlag + "' order by lastmodifieddate desc limit 1";
     }
     this.ux.log("Running query: " + queryData);
     // Query the org

@@ -1,7 +1,7 @@
 {
   "name": "appopsdxcli",
   "description": "The Prodly AppOps CLI for Salesforce DX.",
-  "version": "1.5.1",
+  "version": "1.5.2",
   "author": "Prodly Inc.",
   "bugs": "https://github.com/prodly/appopsdxcli/issues",
   "dependencies": {
