@@ -69,7 +69,7 @@ export default class Org extends SfdxCommand {
             throw new core.SfdxError(messages.getMessage('errorManagedInstaceNotFound')); 
         }
         this.ux.log(`Managed instance ID retrieved, using instance with id ${managedInstance.Id}`);
-        mangedInstanceId =  managedInstance.Id;
+        mangedInstanceId =  managedInstance.id;
 
         this.ux.log("Refreshing org session auth");
         try {
