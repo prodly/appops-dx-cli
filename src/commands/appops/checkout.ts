@@ -69,7 +69,7 @@ export default class Org extends SfdxCommand {
             throw new core.SfdxError(messages.getMessage('errorManagedInstaceNotFound')); 
         }
         this.ux.log(`Managed instance ID retrieved, using instance with id ${managedInstance.Id}`);
-        mangedInstanceId =  managedInstance.Id;
+        mangedInstanceId =  managedInstance.id;
 
         this.ux.log("Refreshing org session auth");
         try {
@@ -92,12 +92,13 @@ export default class Org extends SfdxCommand {
 
     let path = '/services/apexrest/PDRI/v1/instances/' + mangedInstanceId + '/checkout';
 
-    let eventControlOptions = {
-        deactivateAllEvents : true
-    };
+    /*let eventControlOptions = {
+        deactivateAll : deactivateAllEvents === undefined ? false : true
+    }*/
 
     let checkoutInstance = {
-        eventControlOptions : eventControlOptions
+        //eventControlOptions : eventControlOptions
+        deactivateAll : deactivateAllEvents === undefined ? false : true
     };
 
     console.log("Sending checkout request body: ");
@@ -114,7 +115,7 @@ export default class Org extends SfdxCommand {
         if (err) { 
             throw new core.SfdxError(err); 
         }
-        console.log("Checkin instance response: ", JSON.stringify(res));
+        console.log("Checkout instance response: ", JSON.stringify(res));
     });
   }
 
