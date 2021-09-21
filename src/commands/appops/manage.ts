@@ -109,6 +109,15 @@ export default class Org extends SfdxCommand {
 
         let connections = await this.queryConnections(connectionIds, hubConn);
 
+        managedInstances.instances.forEach( (instance) => {
+            let connection = connections.get( instance.connectionId );
+            let connectionName = connection ? connection.Name : '';
+            let instanceUrl = connection ? connection.PDRI__Instance_URL__c : '';
+
+            instance.instanceName = connectionName;
+            instance.instanceUrl = instanceUrl;
+        });
+
         if( printFlag ) {
             this.ux.log(`Printing managed instances.`);
             this.ux.log(``);
