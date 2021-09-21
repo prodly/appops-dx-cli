@@ -101,17 +101,31 @@ export default class Org extends SfdxCommand {
         this.ux.log(`Listing managed instances.`);
         let managedInstances = await this.getManagedInstances(hubConn);
 
+        const connectionIds = [];
+
+        managedInstances.instances.forEach( (instance) => {
+            connectionIds.push( instance.connectionId );
+        });
+
+        let connections = await this.queryConnections(connectionIds, hubConn);
+
         if( printFlag ) {
             this.ux.log(`Printing managed instances.`);
             this.ux.log(``);
+
             managedInstances.instances.forEach( (instance) => {
+                let connection = connections.get( instance.connectionId );
+                let connectionName = connection ? connection.Name : '';
+                let instanceUrl = connection ? connection.PDRI__Instance_URL__c : '';
+
                 this.ux.log(`Managed Instance`);
                 this.ux.log(`Instance ID: ${instance.id}`);
+                this.ux.log(`Instance Name: ${connectionName}`);
                 this.ux.log(`Control Instance: ${instance.controlInstance}`);
                 this.ux.log(`Salesforce Org ID: ${instance.platformInstanceId}`);
                 this.ux.log(`Connection Record ID: ${instance.connectionId}`);
                 this.ux.log(`Instance Type ${instance.instanceType}`);
-                this.ux.log(`Instance URL ${instance.instanceUrl}`);
+                this.ux.log(`Instance URL ${instanceUrl}`);
                 this.ux.log(``);
             });
         }
@@ -175,6 +189,42 @@ export default class Org extends SfdxCommand {
         await this.unmanageInstance(mangedInstanceId, hubConn);
     }
     
+  }
+
+  async queryConnections(connectionIds, hubConn) {
+    this.ux.log("Querying connections");
+
+    if( connectionIds.length == 0 ) {
+        return;
+    }
+
+    var query = `Select Id, Name, PDRI__Instance_URL__c from PDRI__Connection__c where ID IN ( `;
+
+    connectionIds.forEach( (connectionId) => {
+        query += ( `'` + connectionId + `',` );
+    });
+
+    query = query.substring(0, query.length - 1);
+
+    query += `)`;
+
+    this.ux.log("Running source query: " + query);
+
+    // Query the org
+    const result = await hubConn.query(query);
+
+    // The output and --json will automatically be handled for you.
+    if (!result.records || result.records.length <= 0) {
+        throw new core.SfdxError(messages.getMessage('errorNoConnectionFound', [connectionIds]));
+    }
+
+    let connections = new Map();
+
+    result.records.forEach( (connection) => {
+        connections.set(connection.Id, connection);
+    });
+
+    return connections;
   }
 
   async queryConnection(connectionNameOrId, orgIdRegxp, hubConn) {
