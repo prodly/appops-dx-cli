@@ -175,14 +175,16 @@ export default class Org extends SfdxCommand {
         }     
     } else {
         //Source is the dev hub/control org
-        var managedInstance = await this.getManagedInstanceByOrgId( hubConn.getConnectionOptions().orgId, hubConn );   
+        this.ux.log("Source and Destination not specified, setting hub as the source, org ID: ", hubConn.getAuthInfoFields().orgId);
+
+        var managedInstance = await this.getManagedInstanceByOrgId( hubConn.getAuthInfoFields().orgId, hubConn );   
         this.ux.log("Retrieved managed instance ID for the control org: ", managedInstance.id); 
 
         if( !managedInstance ) {
             throw new core.SfdxError("No managed instance found for the devhub/control org."); 
         }
 
-        sourceInstanceId = managedInstance.Id;
+        sourceInstanceId = managedInstance.id;
     }
 
     if (destinationFlag !== undefined) {
