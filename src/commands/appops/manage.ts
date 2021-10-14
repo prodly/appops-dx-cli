@@ -195,7 +195,22 @@ export default class Org extends SfdxCommand {
             throw new core.SfdxError(messages.getMessage('errorManagedInstaceNotProvided')); 
         }
 
-        await this.unmanageInstance(mangedInstanceId, hubConn);
+        var readline = require('readline');
+
+        var rl = readline.createInterface({
+          input: process.stdin,
+          output: process.stdout,
+          prompt: '>'
+        });
+
+        await rl.question(messages.getMessage('unmanageInstancePrompt'), async function(answer) {
+          rl.close();
+
+          if( answer.trim() == mangedInstanceId ) {
+            let org = new Org(null, null);
+            await org.unmanageInstance(mangedInstanceId, hubConn);
+          }
+        });
     }
     
   }
@@ -283,7 +298,7 @@ export default class Org extends SfdxCommand {
   }
 
   async unmanageInstance(instanceId, hubConn) {
-    this.ux.log(`Unmanaging instance with ID ${instanceId}.`); 
+    console.log(`Unmanaging instance with ID ${instanceId}.`); 
 
     let path = '/services/apexrest/PDRI/v1/instances/' + instanceId;
     
@@ -292,11 +307,15 @@ export default class Org extends SfdxCommand {
         url : path
     }
 
-    await hubConn.request(request, function(err, res) {
-        if (err) { 
-            throw new core.SfdxError(err); 
-        }
-    });
+    try {
+        await hubConn.request(request, function(err, res) {
+            if (err) { 
+                throw new core.SfdxError(err); 
+            }
+        }); 
+    } catch (error) {
+        console.log(error);
+    }
 
     return;
   }
