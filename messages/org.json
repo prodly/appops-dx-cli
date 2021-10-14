@@ -32,5 +32,7 @@
     "errorVersionFlagNoManageFlag": "Version flag only specified with the manage operation flag",
     "errorManagedInstaceNotProvided": "Managed instance is not provided for unmanage",
     
-    "errorManagedInstaceNotFound": "Managed instance not found for the specified org id"
+    "errorManagedInstaceNotFound": "Managed instance not found for the specified org id",
+
+    "unmanageInstancePrompt": "Unmanaging is a destructive and irreversible change which will delete all record mappings for this instance. Provide the instance ID if you are sure you want to continue?"
   }
