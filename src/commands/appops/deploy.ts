@@ -90,7 +90,7 @@ export default class Org extends SfdxCommand {
 
     // this.org is guaranteed because requiresUsername=true, as opposed to supportsUsername
     const hubConn = this.hubOrg.getConnection();
-    const orgIdRegxp = /^([a-zA-Z0-9_-]){15,18}$/;
+    const orgIdRegxp = /^([a-zA-Z0-9]){15,18}$/;
 
     let sourceInstanceId;
     let destinationInstanceId;
