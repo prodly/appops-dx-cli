@@ -25,7 +25,7 @@ $ npm install -g appopsdxcli
 $ appopsdxcli COMMAND
 running command...
 $ appopsdxcli (-v|--version|version)
-appopsdxcli/1.5.10 darwin-x64 node-v14.15.5
+appopsdxcli/1.5.11 darwin-x64 node-v14.15.5
 $ appopsdxcli --help [COMMAND]
 USAGE
   $ appopsdxcli COMMAND
@@ -82,7 +82,7 @@ EXAMPLES
      The instance should be managed by the AppOps account associated with the default DevHub control org.
 ```
 
-_See code: [src/commands/appops/checkin.ts](https://github.com/prodly/appopsdxcli/blob/v1.5.10/src/commands/appops/checkin.ts)_
+_See code: [src/commands/appops/checkin.ts](https://github.com/prodly/appopsdxcli/blob/v1.5.11/src/commands/appops/checkin.ts)_
 
 ## `appopsdxcli appops:checkout [-i <string>] [-e] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`
 
@@ -128,7 +128,7 @@ EXAMPLES
        The instance should be managed by the AppOps account associated with the default DevHub control org.
 ```
 
-_See code: [src/commands/appops/checkout.ts](https://github.com/prodly/appopsdxcli/blob/v1.5.10/src/commands/appops/checkout.ts)_
+_See code: [src/commands/appops/checkout.ts](https://github.com/prodly/appopsdxcli/blob/v1.5.11/src/commands/appops/checkout.ts)_
 
 ## `appopsdxcli appops:deploy [-n <string>] [-o <string>] [-s <string>] [-d <string>] [-t <string>] [-p <string>] [-b <string>] [-e] [-l] [-q <string>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`
 
@@ -196,7 +196,7 @@ EXAMPLES
   hub, control org. Long param names.
 ```
 
-_See code: [src/commands/appops/deploy.ts](https://github.com/prodly/appopsdxcli/blob/v1.5.10/src/commands/appops/deploy.ts)_
+_See code: [src/commands/appops/deploy.ts](https://github.com/prodly/appopsdxcli/blob/v1.5.11/src/commands/appops/deploy.ts)_
 
 ## `appopsdxcli appops:manage [-l] [-p] [-m] [-x] [-i <string>] [-b <string>] [-s] [-c <string>] [-n <string>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`
 
@@ -261,7 +261,7 @@ EXAMPLES
   DevHub control org.
 ```
 
-_See code: [src/commands/appops/manage.ts](https://github.com/prodly/appopsdxcli/blob/v1.5.10/src/commands/appops/manage.ts)_
+_See code: [src/commands/appops/manage.ts](https://github.com/prodly/appopsdxcli/blob/v1.5.11/src/commands/appops/manage.ts)_
 <!-- commandsstop -->
 <!-- debugging-your-plugin -->
 # Debugging your plugin
