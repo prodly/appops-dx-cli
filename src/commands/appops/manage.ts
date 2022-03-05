@@ -104,13 +104,15 @@ export default class Org extends SfdxCommand {
         const connectionIds = [];
 
         managedInstances.instances.forEach( (instance) => {
-            connectionIds.push( instance.connectionId );
+            if( instance.connectionId ) {
+                connectionIds.push( instance.connectionId );
+            }
         });
 
         let connections = await this.queryConnections(connectionIds, hubConn);
 
         managedInstances.instances.forEach( (instance) => {
-            let connection = connections.get( instance.connectionId );
+            let connection = instance.connectionId ? connections.get( instance.connectionId ) : null;
             let connectionName = connection ? connection.Name : '';
             let instanceUrl = connection ? connection.PDRI__Instance_URL__c : '';
 
@@ -123,7 +125,7 @@ export default class Org extends SfdxCommand {
             this.ux.log(``);
 
             managedInstances.instances.forEach( (instance) => {
-                let connection = connections.get( instance.connectionId );
+                let connection = instance.connectionId ? connections.get( instance.connectionId ) : null;
                 let connectionName = connection ? connection.Name : '';
                 let instanceUrl = connection ? connection.PDRI__Instance_URL__c : '';
 
