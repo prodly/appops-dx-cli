@@ -34,7 +34,7 @@ export default class Org extends SfdxCommand {
 
   protected static flagsConfig = {
     // flag with a value (-d, --destination=VALUE)
-    name: flags.string({char: 'n', description: messages.getMessage('deplomentNameFlagDescription')}),
+    name: flags.string({char: 'n', required: true, description: messages.getMessage('deplomentNameFlagDescription')}),
     notes: flags.string({char: 'o', description: messages.getMessage('notesFlagDescription')}),
     source: flags.string({char: 's', description: messages.getMessage('sourceFlagDescription')}),
     destination: flags.string({char: 'd', description: messages.getMessage('destinationFlagDescription')}),
