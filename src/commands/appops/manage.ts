@@ -83,6 +83,10 @@ export default class Org extends SfdxCommand {
         throw new core.SfdxError(messages.getMessage('errorMultipleManageFlags', []));
     }
 
+    if (manageFlag !== undefined && labelFlag === undefined) {
+        throw new core.SfdxError(messages.getMessage('errorManageLabelFlag', []));
+    }
+
     if (listFlag === undefined && printFlag !== undefined) {
         throw new core.SfdxError(messages.getMessage('errorPrintFlagNoListFlag', []));
     }
@@ -163,7 +167,7 @@ export default class Org extends SfdxCommand {
             this.ux.log("Created connection with record ID: ", connectionId);
         }
 
-        let managedInstance = await this.manageInstance(this.org.getOrgId(), connectionId, versionFlag, commentFlag, hubConn);
+        let managedInstance = await this.manageInstance(this.org.getOrgId(), connectionId, labelFlag, versionFlag, commentFlag, hubConn);
 
         if( managedInstance === null ) {
             throw new core.SfdxError(messages.getMessage('errorManagedInstaceNotFound')); 
@@ -322,21 +326,24 @@ export default class Org extends SfdxCommand {
     return;
   }
 
-  async manageInstance(orgId, connectionId, versionFlag, comment, hubConn) {
+  async manageInstance(orgId, connectionId, instanceName, versionFlag, comment, hubConn) {
     this.ux.log(`Managing instance for org ID ${orgId}.`); 
 
     let jobId = null;
     let path = '/services/apexrest/PDRI/v1/instances';
-    let platformInstanceBody = '"platformInstance" : {"platformInstanceId": "' + orgId + '", "connectionId" : "' + connectionId + '"}'
+    let platformInstanceBody = '"platformInstance" : {"platformInstanceId": "' + orgId + 
+        '", "connectionId" : "' + connectionId + '", "instanceName": "' + instanceName + '"}'
     let versioningBody = '';
 
     if( versionFlag ) {
         this.ux.log(`Versioning is enabled.`);
-        versioningBody = ', "options": {"checkin": true, "checkout": true, "commitMessage": "' + comment + '"}';
+        versioningBody = ', "options": {"checkin": true, "checkout": true';
 
         if( comment ) {
             versioningBody += ', "commitMessage": "' + comment + '"';
         }
+
+        versioningBody += '}';
     }
 
     let body = '{' + platformInstanceBody + versioningBody + '}';

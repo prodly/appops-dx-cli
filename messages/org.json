@@ -31,6 +31,7 @@
     "errorNoOrgWithManageFlags": "No org specified with the manage flag",
     "errorVersionFlagNoManageFlag": "Version flag only specified with the manage operation flag",
     "errorManagedInstaceNotProvided": "Managed instance is not provided for unmanage",
+    "errorManageLabelFlag": "Instance name flag is required when managing an instance",
     
     "errorManagedInstaceNotFound": "Managed instance not found for the specified org id",
 
