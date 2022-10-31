@@ -25,7 +25,7 @@ $ npm install -g appopsdxcli
 $ appopsdxcli COMMAND
 running command...
 $ appopsdxcli (-v|--version|version)
-appopsdxcli/1.5.13 darwin-x64 node-v18.12.0
+appopsdxcli/1.22.19 darwin-x64 node-v18.12.0
 $ appopsdxcli --help [COMMAND]
 USAGE
   $ appopsdxcli COMMAND
