@@ -1,13 +1,14 @@
-import {core, flags, SfdxCommand} from '@salesforce/command';
+import {flags, SfdxCommand} from '@salesforce/command';
+import {Messages, SfError} from '@salesforce/core';
 import {AnyJson} from '@salesforce/ts-types';
 
 
 // Initialize Messages with the current plugin directory
-core.Messages.importMessagesDirectory(__dirname);
+Messages.importMessagesDirectory(__dirname);
 
 // Load the specific messages for this file. Messages from @salesforce/command, @salesforce/core,
 // or any library that is using the messages framework can also be loaded this way.
-const messages = core.Messages.loadMessages('appopsdxcli', 'org');
+const messages = Messages.loadMessages('appopsdxcli', 'org');
 
 export default class Org extends SfdxCommand {
   public static description = messages.getMessage('commandDescription');
@@ -76,23 +77,23 @@ export default class Org extends SfdxCommand {
     this.ux.log("Connection flag: " + connectionFlag);
 
     if (listFlag === undefined && manageFlag === undefined && unmanageFlag === undefined) {
-        throw new core.SfdxError(messages.getMessage('errorNoManageFlags', []));
+        throw new SfError(messages.getMessage('errorNoManageFlags', []));
     }
 
     if (listFlag !== undefined && manageFlag !== undefined) {
-        throw new core.SfdxError(messages.getMessage('errorMultipleManageFlags', []));
+        throw new SfError(messages.getMessage('errorMultipleManageFlags', []));
     }
 
     if (manageFlag !== undefined && labelFlag === undefined) {
-        throw new core.SfdxError(messages.getMessage('errorManageLabelFlag', []));
+        throw new SfError(messages.getMessage('errorManageLabelFlag', []));
     }
 
     if (listFlag === undefined && printFlag !== undefined) {
-        throw new core.SfdxError(messages.getMessage('errorPrintFlagNoListFlag', []));
+        throw new SfError(messages.getMessage('errorPrintFlagNoListFlag', []));
     }
 
     if (manageFlag === undefined && versionFlag !== undefined) {
-        throw new core.SfdxError(messages.getMessage('errorVersionFlagNoManageFlag', []));
+        throw new SfError(messages.getMessage('errorVersionFlagNoManageFlag', []));
     }
 
     // this.org is guaranteed because requiresUsername=true, as opposed to supportsUsername
@@ -170,7 +171,7 @@ export default class Org extends SfdxCommand {
         let managedInstance = await this.manageInstance(this.org.getOrgId(), connectionId, labelFlag, versionFlag, commentFlag, hubConn);
 
         if( managedInstance === null ) {
-            throw new core.SfdxError(messages.getMessage('errorManagedInstaceNotFound')); 
+            throw new SfError(messages.getMessage('errorManagedInstaceNotFound')); 
         }
 
         this.ux.log("New managed instance: ", managedInstance.id);
@@ -194,11 +195,11 @@ export default class Org extends SfdxCommand {
             //DevHub control org is never used as the default
             var managedInstance = await this.getManagedInstance( orgId, hubConn );
             if( managedInstance === null ) {
-                throw new core.SfdxError(messages.getMessage('errorManagedInstaceNotFound')); 
+                throw new SfError(messages.getMessage('errorManagedInstaceNotFound')); 
             }
             mangedInstanceId = managedInstance.id;
         } else {
-            throw new core.SfdxError(messages.getMessage('errorManagedInstaceNotProvided')); 
+            throw new SfError(messages.getMessage('errorManagedInstaceNotProvided')); 
         }
 
         var readline = require('readline');
@@ -245,7 +246,7 @@ export default class Org extends SfdxCommand {
 
     // The output and --json will automatically be handled for you.
     if (!result.records || result.records.length <= 0) {
-        throw new core.SfdxError(messages.getMessage('errorNoConnectionFound', [connectionIds]));
+        throw new SfError(messages.getMessage('errorNoConnectionFound', [connectionIds]));
     }
 
     let connections = new Map();
@@ -274,7 +275,7 @@ export default class Org extends SfdxCommand {
     const result = await hubConn.query(orgQuery);
     // The output and --json will automatically be handled for you.
     if (!result.records || result.records.length <= 0) {
-        throw new core.SfdxError(messages.getMessage('errorNoConnectionFound', [connectionNameOrId]));
+        throw new SfError(messages.getMessage('errorNoConnectionFound', [connectionNameOrId]));
     }
 
     return result.records[0];
@@ -288,7 +289,7 @@ export default class Org extends SfdxCommand {
 
     await hubConn.request(`${hubConn.instanceUrl}${path}`, function(err, res) {
         if (err) { 
-            throw new core.SfdxError(err); 
+            throw new SfError(err); 
         }
         console.log("Get managed instance response: ", JSON.stringify(res));
         let managedInstances : ManagedInstances = JSON.parse( JSON.stringify(res) );
@@ -316,7 +317,7 @@ export default class Org extends SfdxCommand {
     try {
         await hubConn.request(request, function(err, res) {
             if (err) { 
-                throw new core.SfdxError(err); 
+                throw new SfError(err); 
             }
         }); 
     } catch (error) {
@@ -359,7 +360,7 @@ export default class Org extends SfdxCommand {
 
     await hubConn.request(request, function(err, res) {
         if (err) { 
-            throw new core.SfdxError(err); 
+            throw new SfError(err); 
         }
         
         //console.log("Manage instance response: ", res);
@@ -370,7 +371,7 @@ export default class Org extends SfdxCommand {
     });
 
     if (!jobId) { 
-        throw new core.SfdxError("No job ID returned after submitting an instance to be managed."); 
+        throw new SfError("No job ID returned after submitting an instance to be managed."); 
     }
 
     this.ux.log(`Waiting for completion of the manage instance job ID ${jobId}.`);
@@ -388,7 +389,7 @@ export default class Org extends SfdxCommand {
     }
 
     if( !completedJob ) {
-        throw new core.SfdxError("Manage instance job did not complete within the allowed time.");
+        throw new SfError("Manage instance job did not complete within the allowed time.");
     }
 
     let managedInstance : ManagedInstance = JSON.parse( completedJob.resultData );
@@ -402,7 +403,7 @@ export default class Org extends SfdxCommand {
 
     await hubConn.request(`${hubConn.instanceUrl}${path}`, function(err, res) {
         if (err) { 
-            throw new core.SfdxError(err); 
+            throw new SfError(err); 
         }
         //console.log("Job completion response: ", res);
         let jobsWrapper : Jobs = JSON.parse( res );
@@ -431,7 +432,7 @@ export default class Org extends SfdxCommand {
 
     let retrievedConnection = await hubConn.create("PDRI__Connection__c", connection, function(err, res) {
         if (err) { 
-            throw new core.SfdxError(err); 
+            throw new SfError(err); 
         }
         console.log("Create connection response: ", JSON.stringify(res));
     });
@@ -448,7 +449,7 @@ export default class Org extends SfdxCommand {
 
     await hubConn.request(`${hubConn.instanceUrl}${path}`, function(err, res) {
         if (err) { 
-            throw new core.SfdxError(err); 
+            throw new SfError(err); 
         }
         console.log("Get managed instance response: ", JSON.stringify(res));
         let allManagedInstances : ManagedInstances = JSON.parse( JSON.stringify(res) );

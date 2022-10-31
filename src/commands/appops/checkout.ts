@@ -1,13 +1,14 @@
-import {core, flags, SfdxCommand} from '@salesforce/command';
+import {flags, SfdxCommand} from '@salesforce/command';
+import {Messages, SfError} from '@salesforce/core';
 import {AnyJson} from '@salesforce/ts-types';
 
 
 // Initialize Messages with the current plugin directory
-core.Messages.importMessagesDirectory(__dirname);
+Messages.importMessagesDirectory(__dirname);
 
 // Load the specific messages for this file. Messages from @salesforce/command, @salesforce/core,
 // or any library that is using the messages framework can also be loaded this way.
-const messages = core.Messages.loadMessages('appopsdxcli', 'org');
+const messages = Messages.loadMessages('appopsdxcli', 'org');
 
 export default class Org extends SfdxCommand {
   public static description = messages.getMessage('commandDescription');
@@ -66,7 +67,7 @@ export default class Org extends SfdxCommand {
         //DevHub control org is never used as the default
         var managedInstance = await this.getManagedInstance( this.org.getOrgId(), hubConn );
         if( managedInstance === null ) {
-            throw new core.SfdxError(messages.getMessage('errorManagedInstaceNotFound')); 
+            throw new SfError(messages.getMessage('errorManagedInstaceNotFound')); 
         }
         this.ux.log(`Managed instance ID retrieved, using instance with id ${managedInstance.Id}`);
         mangedInstanceId =  managedInstance.id;
@@ -113,7 +114,7 @@ export default class Org extends SfdxCommand {
 
     await hubConn.request(request, function(err, res) {
         if (err) { 
-            throw new core.SfdxError(err); 
+            throw new SfError(err); 
         }
         console.log("Checkout instance response: ", JSON.stringify(res));
     });
@@ -125,7 +126,7 @@ export default class Org extends SfdxCommand {
 
     return await hubConn.update("PDRI__Connection__c", connection, function(err, res) {
         if (err) { 
-            throw new core.SfdxError(err); 
+            throw new SfError(err); 
         }
         console.log("Update connection response: ", JSON.stringify(res));
     });
@@ -139,7 +140,7 @@ export default class Org extends SfdxCommand {
 
     await hubConn.request(`${hubConn.instanceUrl}${path}`, function(err, res) {
         if (err) { 
-            throw new core.SfdxError(err); 
+            throw new SfError(err); 
         }
         console.log("Get managed instance response: ", JSON.stringify(res));
         let managedInstances : ManagedInstances = JSON.parse( JSON.stringify(res) );
