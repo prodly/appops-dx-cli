@@ -420,11 +420,21 @@ export default class Org extends SfdxCommand {
   async createConnection(name, org, hubConn) {
     const trailSlashRegex = /\/$/;
 
+    var orgType;
+
+    if( org.isScratch ) {
+        orgType = 'Scratch Org';
+    } else if( org.isSandbox ) {
+        orgType = 'Sandbox';
+    } else {
+        orgType = 'Production';
+    }
+
     let connection = { PDRI__Active__c : true, 
         Name : name ? name : org.getUsername() + ' ' + org.getOrgId(), 
         PDRI__OrganizationId__c : org.getOrgId(), 
         PDRI__Access_Token__c : org.getConnection().getConnectionOptions().accessToken,
-        PDRI__Org_Type__c : 'Sandbox',
+        PDRI__Org_Type__c :  orgType,
         PDRI__Instance_URL__c : org.getConnection().getConnectionOptions().instanceUrl.replace(trailSlashRegex, ""),
         PDRI__User_Id__c : org.getConnection().getConnectionOptions().userId,
         PDRI__Username__c : org.getUsername()
