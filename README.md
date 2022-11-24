@@ -25,7 +25,7 @@ $ npm install -g appopsdxcli
 $ sfdx COMMAND
 running command...
 $ sfdx (--version)
-appopsdxcli/1.5.16 darwin-x64 node-v18.12.0
+appopsdxcli/1.5.17 darwin-x64 node-v18.12.0
 $ sfdx --help [COMMAND]
 USAGE
   $ sfdx COMMAND
@@ -81,7 +81,7 @@ EXAMPLES
     The instance should be managed by the AppOps account associated with the default DevHub control org.
 ```
 
-_See code: [src/commands/appops/checkin.ts](https://github.com/prodly/appopsdxcli/blob/v1.5.16/src/commands/appops/checkin.ts)_
+_See code: [src/commands/appops/checkin.ts](https://github.com/prodly/appopsdxcli/blob/v1.5.17/src/commands/appops/checkin.ts)_
 
 ## `sfdx appops:checkout [-i <string>] [-e] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`
 
@@ -126,7 +126,7 @@ EXAMPLES
       The instance should be managed by the AppOps account associated with the default DevHub control org.
 ```
 
-_See code: [src/commands/appops/checkout.ts](https://github.com/prodly/appopsdxcli/blob/v1.5.16/src/commands/appops/checkout.ts)_
+_See code: [src/commands/appops/checkout.ts](https://github.com/prodly/appopsdxcli/blob/v1.5.17/src/commands/appops/checkout.ts)_
 
 ## `sfdx appops:deploy -n <string> [-o <string>] [-s <string>] [-d <string>] [-t <string>] [-p <string>] [-b <string>] [-e] [-l] [-q <string>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`
 
@@ -184,7 +184,7 @@ EXAMPLES
     Command output... deploying to the scratch org from the UAT sandbox, using the named connection record in the dev hub, control org. Long param names.
 ```
 
-_See code: [src/commands/appops/deploy.ts](https://github.com/prodly/appopsdxcli/blob/v1.5.16/src/commands/appops/deploy.ts)_
+_See code: [src/commands/appops/deploy.ts](https://github.com/prodly/appopsdxcli/blob/v1.5.17/src/commands/appops/deploy.ts)_
 
 ## `sfdx appops:manage [-l] [-p] [-m] [-x] [-i <string>] [-b <string>] [-s] [-c <string>] [-n <string>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`
 
@@ -239,7 +239,7 @@ EXAMPLES
     Manage and version the org associated with the target username under the AppOps account associated with the default DevHub control org.
 ```
 
-_See code: [src/commands/appops/manage.ts](https://github.com/prodly/appopsdxcli/blob/v1.5.16/src/commands/appops/manage.ts)_
+_See code: [src/commands/appops/manage.ts](https://github.com/prodly/appopsdxcli/blob/v1.5.17/src/commands/appops/manage.ts)_
 <!-- commandsstop -->
 <!-- debugging-your-plugin -->
 # Debugging your plugin

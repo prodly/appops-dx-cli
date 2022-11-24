@@ -330,7 +330,6 @@ export default class Org extends SfdxCommand {
   async manageInstance(orgId, connectionId, instanceName, versionFlag, comment, hubConn) {
     this.ux.log(`Managing instance for org ID ${orgId}.`); 
 
-    let jobId = null;
     let path = '/services/apexrest/PDRI/v1/instances';
     let platformInstanceBody = '"platformInstance" : {"platformInstanceId": "' + orgId + 
         '", "connectionId" : "' + connectionId + '", "instanceName": "' + instanceName + '"}'
@@ -358,17 +357,18 @@ export default class Org extends SfdxCommand {
 
     console.log("Body: ", body);
 
-    await hubConn.request(request, function(err, res) {
+    let res = await hubConn.request(request, function(err, res) {
+        //console.log("Got response ");
         if (err) { 
+            //this.ux.log("Manage instance error: ", err);
             throw new SfError(err); 
         }
-        
-        //console.log("Manage instance response: ", res);
-        let jobsWrapper : Jobs = JSON.parse( res );
-        console.log("parsed job wrapper");
-        jobId = jobsWrapper.jobs[0].id;
-        console.log("Job id: ", jobId);
     });
+
+    this.ux.log(`Manage instance response ${res}.`);
+    let jobsWrapper : Jobs = JSON.parse( res );
+    let jobId = jobsWrapper.jobs[0].id;
+    this.ux.log(`Manage instance job ID ${jobId}.`);
 
     if (!jobId) { 
         throw new SfError("No job ID returned after submitting an instance to be managed."); 
@@ -379,7 +379,9 @@ export default class Org extends SfdxCommand {
     //Currently wait for no jobs to be returned, which mean the job completed, but bad way of doing this.
     let completedJob = null;
     for (let i = 0; i < 1800; i++) {
+        this.ux.log(`Calling job completion check.`);
         let job = await this.jobCompletion(jobId, hubConn);
+        this.ux.log(`Completed job completion check.`);
         if( job ) {
             this.ux.log(`Job completed.`);
             completedJob = job;
@@ -401,18 +403,22 @@ export default class Org extends SfdxCommand {
     let path = '/services/apexrest/PDRI/v1/jobs/' + jobId;
     let completedJob = undefined;
 
-    await hubConn.request(`${hubConn.instanceUrl}${path}`, function(err, res) {
+    let res = await hubConn.request(`${hubConn.instanceUrl}${path}`, function(err, res) {
         if (err) { 
             throw new SfError(err); 
         }
-        //console.log("Job completion response: ", res);
-        let jobsWrapper : Jobs = JSON.parse( res );
-        let job = jobsWrapper.jobs[0];
-        
-        if( job.status == 'COMPLETED' ) {
-            completedJob = job;
-        }
     });
+
+    this.ux.log(`Job status result ${res}.`);
+
+    let jobsWrapper : Jobs = JSON.parse( res );
+    let job = jobsWrapper.jobs[0];
+
+    this.ux.log(`Job status job ${job}.`);
+            
+    if( job.status == 'ABORTED' ) {
+        completedJob = job;
+    }
 
     return completedJob;
   }
@@ -455,9 +461,8 @@ export default class Org extends SfdxCommand {
     this.ux.log(`Retrieving all managed instances.`);
 
     let path = '/services/apexrest/PDRI/v1/instances';
-    let managedInstances = null;
 
-    await hubConn.request(`${hubConn.instanceUrl}${path}`, function(err, res) {
+    let managedInstances = await hubConn.request(`${hubConn.instanceUrl}${path}`, function(err, res) {
         if (err) { 
             throw new SfError(err); 
         }
