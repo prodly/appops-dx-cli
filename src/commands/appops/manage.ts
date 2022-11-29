@@ -344,6 +344,8 @@ export default class Org extends SfdxCommand {
         }
 
         versioningBody += '}';
+    } else {
+        versioningBody = ', "options": {"checkin": false, "checkout": false, "environmentExists": false}';
     }
 
     let body = '{' + platformInstanceBody + versioningBody + '}';
@@ -416,7 +418,7 @@ export default class Org extends SfdxCommand {
 
     this.ux.log(`Job status job ${job}.`);
             
-    if( job.status == 'ABORTED' ) {
+    if( job.status == 'COMPLETED' ) {
         completedJob = job;
     }
 
