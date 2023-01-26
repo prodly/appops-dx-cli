@@ -299,6 +299,7 @@ export default class Org extends SfdxCommand {
     let deployInstance = {
         deploymentName : deploymentName,
         deploymentNotes : deploymentNotes,
+        engagementId : null,
         data : [dataDeploymentOptions],
         metadata : {},
         source : sourceOptions
