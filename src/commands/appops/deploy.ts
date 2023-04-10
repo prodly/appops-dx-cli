@@ -384,19 +384,18 @@ export default class Org extends SfdxCommand {
 
     let managedInstance = undefined;
     
-    await hubConn.request(`${hubConn.instanceUrl}${path}`, function(err, res) {
-        if (err) { 
-            throw new SfError(err); 
-        }
-        console.log("Get managed instance response: ", JSON.stringify(res));
-        let managedInstances : ManagedInstances = JSON.parse( JSON.stringify(res) );
+    try {
+        const instancesRes = await hubConn.request(`${hubConn.instanceUrl}${path}`);
+        let managedInstances : ManagedInstances = JSON.parse( JSON.stringify(instancesRes) );
         managedInstances.instances.forEach( (instance) => {
             if( instance.platformInstanceId === orgId ) {
                 console.log("Found matching instance: ", instance);
                 managedInstance = instance;
             }
         });
-    });
+    } catch (err) {
+        throw new SfError(err); 
+    }
 
     return managedInstance;
   }  
