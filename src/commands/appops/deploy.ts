@@ -379,16 +379,22 @@ export default class Org extends SfdxCommand {
 
   async getManagedInstanceByOrgId(orgId, hubConn) {
     this.ux.log(`Retrieving the managed instance ID for org ${orgId}.`);
-    let path = '/services/apexrest/PDRI/v1/instances';
+    let path = "/services/apexrest/PDRI/v1/instances";
     try {
-        const instancesRes = await hubConn.request(`${hubConn.instanceUrl}${path}`);
-        let managedInstances : ManagedInstances = JSON.parse( JSON.stringify(instancesRes) );
-        const managedInstance = managedInstances.instances.find( instance => instance.platformInstanceId === orgId );
-        return managedInstance;
+      const instancesRes = await hubConn.request(
+        `${hubConn.instanceUrl}${path}`
+      );
+      let managedInstances: ManagedInstances = JSON.parse(
+        JSON.stringify(instancesRes)
+      );
+      const managedInstance = managedInstances.instances.find(
+        (instance) => instance.platformInstanceId === orgId
+      );
+      return managedInstance;
     } catch (err) {
-        throw new SfError(err); 
+      throw new SfError(err);
     }
-  }  
+  }
 
   /*async getManagedInstanceByInstanceId(instanceId, hubConn) {
     this.ux.log(`Retrieving the managed instance ID for connection ID ${connectionId}.`);
