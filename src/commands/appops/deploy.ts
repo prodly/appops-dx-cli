@@ -143,8 +143,8 @@ export default class Org extends SfdxCommand {
         this.ux.log("Source managed instance parameter is not specified, finding or creating managed instance by org ID: ", this.org.getOrgId());
 
         //Check if a managed instance exist with the same org ID
-        var managedInstance = await this.getManagedInstanceByOrgId( this.org.getOrgId(), hubConn );   
-        this.ux.log("Retrieved managed instance: ", managedInstance);       
+        var managedInstance = await this.getManagedInstanceByOrgId( this.org.getOrgId(), hubConn );
+        this.ux.log("Retrieved managed instance: ", JSON.stringify(managedInstance));
         if( managedInstance ) {
             //If exists, use that managed instance ID
             this.ux.log("Managed instance found, using it, with ID: " + managedInstance.id);
@@ -197,8 +197,8 @@ export default class Org extends SfdxCommand {
         this.ux.log("Destination managed instance parameter is not specified, finding or creating managed instance by org ID: ", this.org.getOrgId());
 
         //Check if a managed instance exist with the same org ID
-        var managedInstance = await this.getManagedInstanceByOrgId( this.org.getOrgId(), hubConn );   
-        this.ux.log("Retrieved managed instance: ", managedInstance);
+        var managedInstance = await this.getManagedInstanceByOrgId( this.org.getOrgId(), hubConn );
+        this.ux.log("Retrieved managed instance: ", JSON.stringify(managedInstance));
         if( managedInstance ) {
             //If exists, use that managed instance ID
             this.ux.log("Managed instance found, using it, with ID: " + managedInstance.id);
@@ -379,27 +379,22 @@ export default class Org extends SfdxCommand {
 
   async getManagedInstanceByOrgId(orgId, hubConn) {
     this.ux.log(`Retrieving the managed instance ID for org ${orgId}.`);
-
-    let path = '/services/apexrest/PDRI/v1/instances';
-
-    let managedInstance = undefined;
-    
-    await hubConn.request(`${hubConn.instanceUrl}${path}`, function(err, res) {
-        if (err) { 
-            throw new SfError(err); 
-        }
-        console.log("Get managed instance response: ", JSON.stringify(res));
-        let managedInstances : ManagedInstances = JSON.parse( JSON.stringify(res) );
-        managedInstances.instances.forEach( (instance) => {
-            if( instance.platformInstanceId === orgId ) {
-                console.log("Found matching instance: ", instance);
-                managedInstance = instance;
-            }
-        });
-    });
-
-    return managedInstance;
-  }  
+    let path = "/services/apexrest/PDRI/v1/instances";
+    try {
+      const instancesRes = await hubConn.request(
+        `${hubConn.instanceUrl}${path}`
+      );
+      const managedInstances: ManagedInstances = JSON.parse(
+        JSON.stringify(instancesRes)
+      );
+      const managedInstance = managedInstances.instances.find(
+        (instance) => instance.platformInstanceId === orgId
+      );
+      return managedInstance;
+    } catch (err) {
+      throw new SfError(err);
+    }
+  }
 
   /*async getManagedInstanceByInstanceId(instanceId, hubConn) {
     this.ux.log(`Retrieving the managed instance ID for connection ID ${connectionId}.`);
