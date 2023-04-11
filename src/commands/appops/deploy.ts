@@ -384,7 +384,7 @@ export default class Org extends SfdxCommand {
       const instancesRes = await hubConn.request(
         `${hubConn.instanceUrl}${path}`
       );
-      let managedInstances: ManagedInstances = JSON.parse(
+      const managedInstances: ManagedInstances = JSON.parse(
         JSON.stringify(instancesRes)
       );
       const managedInstance = managedInstances.instances.find(
