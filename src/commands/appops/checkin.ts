@@ -69,7 +69,7 @@ export default class Org extends SfdxCommand {
         if( managedInstance === null ) {
             throw new SfError(messages.getMessage('errorManagedInstaceNotFound')); 
         }
-        this.ux.log(`Managed instance ID retrieved, using instance with id ${managedInstance.Id}`);
+        this.ux.log(`Managed instance ID retrieved, using instance with id ${managedInstance.id}`);
         mangedInstanceId =  managedInstance.id;
 
         this.ux.log("Refreshing org session auth");
@@ -131,23 +131,22 @@ export default class Org extends SfdxCommand {
     this.ux.log(`Retrieving the managed instance ID for org ${orgId}.`);
 
     let path = '/services/apexrest/PDRI/v1/instances';
-    let managedInstance = null;
 
-    await hubConn.request(`${hubConn.instanceUrl}${path}`, function(err, res) {
-        if (err) { 
-            throw new SfError(err); 
-        }
-        console.log("Get managed instance response: ", JSON.stringify(res));
-        let managedInstances : ManagedInstances = JSON.parse( JSON.stringify(res) );
-        managedInstances.instances.forEach( (instance) => {
-            if( instance.platformInstanceId === orgId ) {
-                console.log("Found matching instance: ", instance);
-                managedInstance = instance;
-            }
-        });
-    });
 
-    return managedInstance;
+    try {
+        const instancesRes = await hubConn.request(
+          `${hubConn.instanceUrl}${path}`
+        );
+        const managedInstances: ManagedInstances = JSON.parse(
+          JSON.stringify(instancesRes)
+        );
+        const managedInstance = managedInstances.instances.find(
+          (instance) => instance.platformInstanceId === orgId
+        );
+        return managedInstance;
+      } catch (err) {
+        throw new SfError(err);
+      }
   }
 }
 
