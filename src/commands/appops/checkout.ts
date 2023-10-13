@@ -33,7 +33,8 @@ export default class Org extends SfdxCommand {
   protected static flagsConfig = {
     // flag with a value (-d, --destination=VALUE)
     instance: flags.string({char: 'i', description: messages.getMessage('instanceFlagDescription')}),
-    deactivate: flags.boolean({char: 'e', description: messages.getMessage('deactivateFlagDescription')})
+    deactivate: flags.boolean({char: 'e', description: messages.getMessage('deactivateFlagDescription')}),
+    branch: flags.string({char: 'b', description: messages.getMessage('branchFlagDescription')})
   };
 
   // Comment this out if your command does not require an org username
@@ -48,9 +49,11 @@ export default class Org extends SfdxCommand {
   public async run(): Promise<AnyJson> {
     const instanceFlag = this.flags.instance;
     const deactivateFlag = this.flags.deactivate;
+    const branchFlag = this.flags.branch;
 
     this.ux.log("Instance flag: " + instanceFlag);
     this.ux.log("Deactivate flag: " + deactivateFlag);
+    this.ux.log("Branch flag: " + branchFlag);
 
     // this.org is guaranteed because requiresUsername=true, as opposed to supportsUsername
     const hubConn = this.hubOrg.getConnection();
@@ -83,12 +86,12 @@ export default class Org extends SfdxCommand {
     }
 
     //Perform the checkin
-    await this.checkoutInstance(mangedInstanceId, deactivateFlag, hubConn);
+    await this.checkoutInstance(mangedInstanceId, deactivateFlag, branchFlag, hubConn);
 
     return '{}';
   }
 
-  async checkoutInstance(mangedInstanceId, deactivateAllEvents, hubConn) {
+  async checkoutInstance(mangedInstanceId, deactivateAllEvents, branchFlag, hubConn) {
     this.ux.log(`Performing checkout for managed instance with id ${mangedInstanceId}.`);
 
     let path = '/services/apexrest/PDRI/v1/instances/' + mangedInstanceId + '/checkout';
@@ -98,6 +101,7 @@ export default class Org extends SfdxCommand {
     }*/
 
     let checkoutInstance = {
+        branchName : branchFlag,
         //eventControlOptions : eventControlOptions
         deactivateAll : deactivateAllEvents === undefined ? false : true
     };
