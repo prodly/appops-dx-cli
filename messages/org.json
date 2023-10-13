@@ -6,6 +6,7 @@
     "destinationFlagDescription": "destination managed instance ID",
     "dataSetFlagDescription": "name or record ID of the data set to deploy",
     "deploymentPlanFlagDescription": "name or record ID of the deployment plan to deploy",
+    "branchFlagDescription": "branch name for deployment",
 
     "listFlagDescription": "list all managed instances",
     "printFlagDescription": "print the managed instances in a standard format in addition to returning structured data",
