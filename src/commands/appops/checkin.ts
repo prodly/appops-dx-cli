@@ -105,8 +105,13 @@ export default class Org extends SfdxCommand {
 
     let path = '/services/apexrest/PDRI/v1/instances/' + mangedInstanceId + '/checkin';
 
-    let checkinInstance = {
+    let checkinOptions = {
         commitMessage : comment
+    };
+
+    let checkinInstance = {
+        options : checkinOptions
+        
     };
 
     console.log("Sending checkin request body: ");
