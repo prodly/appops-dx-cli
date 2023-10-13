@@ -34,7 +34,9 @@ export default class Org extends SfdxCommand {
     // flag with a value (-d, --destination=VALUE)
     instance: flags.string({char: 'i', description: messages.getMessage('instanceFlagDescription')}),
     comment: flags.string({char: 'c', description: messages.getMessage('commentFlagDescription')}),
-    branch: flags.string({char: 'b', description: messages.getMessage('branchFlagDescription')})
+    branch: flags.string({char: 'b', description: messages.getMessage('branchFlagDescription')}),
+    dataset: flags.string({char: 't', description: messages.getMessage('dataSetFlagDescription')}),
+    plan: flags.string({char: 'p', description: messages.getMessage('deploymentPlanFlagDescription')})
   };
 
   // Comment this out if your command does not require an org username
@@ -50,15 +52,33 @@ export default class Org extends SfdxCommand {
     const instanceFlag = this.flags.instance;
     const commentFlag = this.flags.comment;
     const branchFlag = this.flags.branch;
+    const datasetFlag = this.flags.dataset;
+    const planFlag = this.flags.plan;
 
     this.ux.log("Instance flag: " + instanceFlag);
     this.ux.log("Comment flag: " + commentFlag);
     this.ux.log("Branch flag: " + branchFlag);
+    this.ux.log("Data set flag: " + datasetFlag);
+    this.ux.log("Deployment plan flag: " + planFlag);
 
     // this.org is guaranteed because requiresUsername=true, as opposed to supportsUsername
     const hubConn = this.hubOrg.getConnection();
+    const orgIdRegxp = /^([a-zA-Z0-9]){15,18}$/;
 
     let mangedInstanceId = null;
+    let dataSetId;
+    let deploymentPlanId;
+
+    //Retrieve the data set or deployment plan to deploy
+    this.ux.log(`Retrieving data set or deployment plan to deploy.`);
+    if (datasetFlag !== undefined) {
+        dataSetId = await this.getDeploymentEntityId(datasetFlag, 'PDRI__DataSet__c', orgIdRegxp, hubConn);
+    } else if (planFlag !== undefined) {
+        deploymentPlanId = await this.getDeploymentEntityId(planFlag, 'PDRI__Deployment_Plan__c', orgIdRegxp, hubConn);
+    }
+
+    this.ux.log("Data set ID: " + dataSetId);
+    this.ux.log("Deployment plan ID: " + deploymentPlanId);
 
     //Check if instance is provided
     if (instanceFlag !== undefined) {
@@ -86,7 +106,7 @@ export default class Org extends SfdxCommand {
     }
 
     //Perform the checkin
-    await this.checkinInstance(mangedInstanceId, commentFlag, branchFlag, hubConn);
+    await this.checkinInstance(mangedInstanceId, commentFlag, branchFlag, dataSetId, deploymentPlanId, hubConn);
 
     return '{}';
   }
@@ -103,7 +123,7 @@ export default class Org extends SfdxCommand {
     });
   }  
 
-  async checkinInstance(mangedInstanceId, comment, branchFlag, hubConn) {
+  async checkinInstance(mangedInstanceId, comment, branchFlag, dataSetId, deploymentPlanId, hubConn) {
     this.ux.log(`Performing checkin for managed instance with id ${mangedInstanceId}.`);
 
     let path = '/services/apexrest/PDRI/v1/instances/' + mangedInstanceId + '/checkin';
@@ -113,6 +133,8 @@ export default class Org extends SfdxCommand {
     };
 
     let checkinInstance = {
+        datasetId : dataSetId,
+        deploymentPlanId : deploymentPlanId,
         branchName : branchFlag,
         options : checkinOptions
     };
@@ -133,6 +155,36 @@ export default class Org extends SfdxCommand {
         }
         console.log("Checkin instance response: ", JSON.stringify(res));
     });
+  }
+
+  async getDeploymentEntityId(dataEntityFlag,  
+    dataEntityType, 
+    orgIdRegxp,
+    hubConn) {
+    const isId = orgIdRegxp.test(dataEntityFlag);
+    this.ux.log("Is org ID: " + isId);
+    let queryData;
+    if (isId && dataEntityType === 'PDRI__DataSet__c') {
+        queryData = "Select Id, Name from " + dataEntityType + " where PDRI__Active__c = true AND Id = '" + dataEntityFlag + "' order by lastmodifieddate desc limit 1";
+    } else if (isId && dataEntityType === 'PDRI__Deployment_Plan__c') {
+        queryData = "Select Id, Name from " + dataEntityType + " where Id = '" + dataEntityFlag + "' order by lastmodifieddate desc limit 1";
+    } else if( !isId && dataEntityType === 'PDRI__DataSet__c' ) {
+        queryData = "Select Id, Name from " + dataEntityType + " where PDRI__Active__c = true AND Name = '" + dataEntityFlag + "' order by lastmodifieddate desc limit 1";
+    } else if( !isId && dataEntityType === 'PDRI__Deployment_Plan__c' ) {
+        queryData = "Select Id, Name from " + dataEntityType + " where Name = '" + dataEntityFlag + "' order by lastmodifieddate desc limit 1";
+    }
+    this.ux.log("Running query: " + queryData);
+    // Query the org
+    const result = await hubConn.query(queryData);
+    // The output and --json will automatically be handled for you.
+    if (!result.records || result.records.length <= 0) {
+        if( dataEntityType = 'PDRI__DataSet__c' ) {
+            throw new SfError(messages.getMessage('errorNoDataSetFound', [dataEntityFlag]));
+        } else {
+            throw new SfError(messages.getMessage('errorNoDeploymentPlanFound', [dataEntityFlag]));          
+        }
+    }
+    return result.records[0].Id;
   }
 
   async getManagedInstance(orgId, hubConn) {
