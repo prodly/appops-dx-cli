@@ -33,6 +33,7 @@ export default class Org extends SfdxCommand {
   protected static flagsConfig = {
     // flag with a value (-d, --destination=VALUE)
     instance: flags.string({char: 'i', description: messages.getMessage('instanceFlagDescription')}),
+    notes: flags.string({char: 'o', description: messages.getMessage('notesFlagDescription')}),
     comment: flags.string({char: 'c', description: messages.getMessage('commentFlagDescription')}),
     branch: flags.string({char: 'b', description: messages.getMessage('branchFlagDescription')}),
     dataset: flags.string({char: 't', description: messages.getMessage('dataSetFlagDescription')}),
@@ -50,12 +51,14 @@ export default class Org extends SfdxCommand {
 
   public async run(): Promise<AnyJson> {
     const instanceFlag = this.flags.instance;
+    const deploymentNotesFlag = this.flags.notes;
     const commentFlag = this.flags.comment;
     const branchFlag = this.flags.branch;
     const datasetFlag = this.flags.dataset;
     const planFlag = this.flags.plan;
 
     this.ux.log("Instance flag: " + instanceFlag);
+    this.ux.log("Deployment description flag: " + deploymentNotesFlag);
     this.ux.log("Comment flag: " + commentFlag);
     this.ux.log("Branch flag: " + branchFlag);
     this.ux.log("Data set flag: " + datasetFlag);
@@ -106,7 +109,7 @@ export default class Org extends SfdxCommand {
     }
 
     //Perform the checkin
-    await this.checkinInstance(mangedInstanceId, commentFlag, branchFlag, dataSetId, deploymentPlanId, hubConn);
+    await this.checkinInstance(mangedInstanceId, commentFlag, branchFlag, dataSetId, deploymentPlanId, deploymentNotesFlag, hubConn);
 
     return '{}';
   }
@@ -123,7 +126,7 @@ export default class Org extends SfdxCommand {
     });
   }  
 
-  async checkinInstance(mangedInstanceId, comment, branchFlag, dataSetId, deploymentPlanId, hubConn) {
+  async checkinInstance(mangedInstanceId, comment, branchFlag, dataSetId, deploymentPlanId, deploymentNotes, hubConn) {
     this.ux.log(`Performing checkin for managed instance with id ${mangedInstanceId}.`);
 
     let path = '/services/apexrest/PDRI/v1/instances/' + mangedInstanceId + '/checkin';
@@ -136,7 +139,8 @@ export default class Org extends SfdxCommand {
         datasetId : dataSetId,
         deploymentPlanId : deploymentPlanId,
         branchName : branchFlag,
-        options : checkinOptions
+        options : checkinOptions,
+        deploymentNotes : deploymentNotes
     };
 
     console.log("Sending checkin request body: ");

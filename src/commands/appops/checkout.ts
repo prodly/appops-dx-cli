@@ -34,6 +34,7 @@ export default class Org extends SfdxCommand {
     // flag with a value (-d, --destination=VALUE)
     instance: flags.string({char: 'i', description: messages.getMessage('instanceFlagDescription')}),
     deactivate: flags.boolean({char: 'e', description: messages.getMessage('deactivateFlagDescription')}),
+    notes: flags.string({char: 'o', description: messages.getMessage('notesFlagDescription')}),
     branch: flags.string({char: 'b', description: messages.getMessage('branchFlagDescription')}),
     dataset: flags.string({char: 't', description: messages.getMessage('dataSetFlagDescription')}),
     plan: flags.string({char: 'p', description: messages.getMessage('deploymentPlanFlagDescription')})
@@ -51,12 +52,14 @@ export default class Org extends SfdxCommand {
   public async run(): Promise<AnyJson> {
     const instanceFlag = this.flags.instance;
     const deactivateFlag = this.flags.deactivate;
+    const deploymentNotesFlag = this.flags.notes;
     const branchFlag = this.flags.branch;
     const datasetFlag = this.flags.dataset;
     const planFlag = this.flags.plan;
 
     this.ux.log("Instance flag: " + instanceFlag);
     this.ux.log("Deactivate flag: " + deactivateFlag);
+    this.ux.log("Deployment description flag: " + deploymentNotesFlag);
     this.ux.log("Branch flag: " + branchFlag);
     this.ux.log("Data set flag: " + datasetFlag);
     this.ux.log("Deployment plan flag: " + planFlag);
@@ -106,7 +109,7 @@ export default class Org extends SfdxCommand {
     }
 
     //Perform the checkin
-    await this.checkoutInstance(mangedInstanceId, deactivateFlag, branchFlag, dataSetId, deploymentPlanId, hubConn);
+    await this.checkoutInstance(mangedInstanceId, deactivateFlag, branchFlag, dataSetId, deploymentPlanId, deploymentNotesFlag, hubConn);
 
     return '{}';
   }
@@ -141,7 +144,7 @@ export default class Org extends SfdxCommand {
     return result.records[0].Id;
   }
 
-  async checkoutInstance(mangedInstanceId, deactivateAllEvents, branchFlag, dataSetId, deploymentPlanId, hubConn) {
+  async checkoutInstance(mangedInstanceId, deactivateAllEvents, branchFlag, dataSetId, deploymentPlanId, deploymentNotes, hubConn) {
     this.ux.log(`Performing checkout for managed instance with id ${mangedInstanceId}.`);
 
     let path = '/services/apexrest/PDRI/v1/instances/' + mangedInstanceId + '/checkout';
@@ -155,7 +158,8 @@ export default class Org extends SfdxCommand {
         deploymentPlanId : deploymentPlanId,
         branchName : branchFlag,
         //eventControlOptions : eventControlOptions
-        deactivateAll : deactivateAllEvents === undefined ? false : true
+        deactivateAll : deactivateAllEvents === undefined ? false : true,
+        deploymentNotes : deploymentNotes
     };
 
     console.log("Sending checkout request body: ");
