@@ -25,7 +25,7 @@ $ npm install -g appopsdxcli
 $ sfdx COMMAND
 running command...
 $ sfdx (--version)
-appopsdxcli/1.5.21 darwin-x64 node-v18.12.0
+appopsdxcli/1.5.22 darwin-x64 node-v18.12.0
 $ sfdx --help [COMMAND]
 USAGE
   $ sfdx COMMAND
@@ -33,25 +33,31 @@ USAGE
 ```
 <!-- usagestop -->
 <!-- commands -->
-* [`sfdx appops:checkin [-i <string>] [-c <string>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`](#sfdx-appopscheckin--i-string--c-string--v-string--u-string---apiversion-string---json---loglevel-tracedebuginfowarnerrorfataltracedebuginfowarnerrorfatal)
-* [`sfdx appops:checkout [-i <string>] [-e] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`](#sfdx-appopscheckout--i-string--e--v-string--u-string---apiversion-string---json---loglevel-tracedebuginfowarnerrorfataltracedebuginfowarnerrorfatal)
+* [`sfdx appops:checkin [-i <string>] [-c <string>] [-b <string>] [-t <string>] [-p <string>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`](#sfdx-appopscheckin--i-string--c-string--b-string--t-string--p-string--v-string--u-string---apiversion-string---json---loglevel-tracedebuginfowarnerrorfataltracedebuginfowarnerrorfatal)
+* [`sfdx appops:checkout [-i <string>] [-e] [-b <string>] [-t <string>] [-p <string>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`](#sfdx-appopscheckout--i-string--e--b-string--t-string--p-string--v-string--u-string---apiversion-string---json---loglevel-tracedebuginfowarnerrorfataltracedebuginfowarnerrorfatal)
 * [`sfdx appops:deploy -n <string> [-o <string>] [-s <string>] [-d <string>] [-t <string>] [-p <string>] [-b <string>] [-e] [-l] [-q <string>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`](#sfdx-appopsdeploy--n-string--o-string--s-string--d-string--t-string--p-string--b-string--e--l--q-string--v-string--u-string---apiversion-string---json---loglevel-tracedebuginfowarnerrorfataltracedebuginfowarnerrorfatal)
 * [`sfdx appops:manage [-l] [-p] [-m] [-x] [-i <string>] [-b <string>] [-s] [-c <string>] [-n <string>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`](#sfdx-appopsmanage--l--p--m--x--i-string--b-string--s--c-string--n-string--v-string--u-string---apiversion-string---json---loglevel-tracedebuginfowarnerrorfataltracedebuginfowarnerrorfatal)
 
-## `sfdx appops:checkin [-i <string>] [-c <string>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`
+## `sfdx appops:checkin [-i <string>] [-c <string>] [-b <string>] [-t <string>] [-p <string>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`
 
 Launches an AppOps relational data deployment.
 
 ```
 USAGE
-  $ sfdx appops:checkin [-i <string>] [-c <string>] [-v <string>] [-u <string>] [--apiversion <string>] [--json]
-    [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]
+  $ sfdx appops:checkin [-i <string>] [-c <string>] [-b <string>] [-t <string>] [-p <string>] [-v <string>] [-u
+    <string>] [--apiversion <string>] [--json] [--loglevel
+    trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]
 
 FLAGS
+  -b, --branch=<value>                                                              branch name for deployment
   -c, --comment=<value>                                                             comment for the command versioning
                                                                                     commit
   -i, --instance=<value>                                                            managed instance ID on which to
                                                                                     perform the action
+  -p, --plan=<value>                                                                name or record ID of the deployment
+                                                                                    plan to deploy
+  -t, --dataset=<value>                                                             name or record ID of the data set to
+                                                                                    deploy
   -u, --targetusername=<value>                                                      username or alias for the target
                                                                                     org; overrides default target org
   -v, --targetdevhubusername=<value>                                                username or alias for the dev hub
@@ -81,22 +87,27 @@ EXAMPLES
     The instance should be managed by the AppOps account associated with the default DevHub control org.
 ```
 
-_See code: [src/commands/appops/checkin.ts](https://github.com/prodly/appopsdxcli/blob/v1.5.21/src/commands/appops/checkin.ts)_
+_See code: [src/commands/appops/checkin.ts](https://github.com/prodly/appopsdxcli/blob/v1.5.22/src/commands/appops/checkin.ts)_
 
-## `sfdx appops:checkout [-i <string>] [-e] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`
+## `sfdx appops:checkout [-i <string>] [-e] [-b <string>] [-t <string>] [-p <string>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`
 
 Launches an AppOps relational data deployment.
 
 ```
 USAGE
-  $ sfdx appops:checkout [-i <string>] [-e] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel
-    trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]
+  $ sfdx appops:checkout [-i <string>] [-e] [-b <string>] [-t <string>] [-p <string>] [-v <string>] [-u <string>]
+    [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]
 
 FLAGS
+  -b, --branch=<value>                                                              branch name for deployment
   -e, --deactivate                                                                  deactivate all events for the
                                                                                     deployment
   -i, --instance=<value>                                                            managed instance ID on which to
                                                                                     perform the action
+  -p, --plan=<value>                                                                name or record ID of the deployment
+                                                                                    plan to deploy
+  -t, --dataset=<value>                                                             name or record ID of the data set to
+                                                                                    deploy
   -u, --targetusername=<value>                                                      username or alias for the target
                                                                                     org; overrides default target org
   -v, --targetdevhubusername=<value>                                                username or alias for the dev hub
@@ -126,7 +137,7 @@ EXAMPLES
       The instance should be managed by the AppOps account associated with the default DevHub control org.
 ```
 
-_See code: [src/commands/appops/checkout.ts](https://github.com/prodly/appopsdxcli/blob/v1.5.21/src/commands/appops/checkout.ts)_
+_See code: [src/commands/appops/checkout.ts](https://github.com/prodly/appopsdxcli/blob/v1.5.22/src/commands/appops/checkout.ts)_
 
 ## `sfdx appops:deploy -n <string> [-o <string>] [-s <string>] [-d <string>] [-t <string>] [-p <string>] [-b <string>] [-e] [-l] [-q <string>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`
 
@@ -184,7 +195,7 @@ EXAMPLES
     Command output... deploying to the scratch org from the UAT sandbox, using the named connection record in the dev hub, control org. Long param names.
 ```
 
-_See code: [src/commands/appops/deploy.ts](https://github.com/prodly/appopsdxcli/blob/v1.5.21/src/commands/appops/deploy.ts)_
+_See code: [src/commands/appops/deploy.ts](https://github.com/prodly/appopsdxcli/blob/v1.5.22/src/commands/appops/deploy.ts)_
 
 ## `sfdx appops:manage [-l] [-p] [-m] [-x] [-i <string>] [-b <string>] [-s] [-c <string>] [-n <string>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`
 
@@ -239,7 +250,7 @@ EXAMPLES
     Manage and version the org associated with the target username under the AppOps account associated with the default DevHub control org.
 ```
 
-_See code: [src/commands/appops/manage.ts](https://github.com/prodly/appopsdxcli/blob/v1.5.21/src/commands/appops/manage.ts)_
+_See code: [src/commands/appops/manage.ts](https://github.com/prodly/appopsdxcli/blob/v1.5.22/src/commands/appops/manage.ts)_
 <!-- commandsstop -->
 <!-- debugging-your-plugin -->
 # Debugging your plugin
